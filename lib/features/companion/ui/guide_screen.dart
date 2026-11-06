@@ -56,8 +56,11 @@ class _GuideScreenState extends State<GuideScreen> {
               if (snapshot.hasError) {
                 return ErrorView(
                   message: 'No se pudo cargar la guía semanal.',
-                  onRetry: () =>
-                      setState(() => _guide = WeeklyGuide.load(rootBundle)),
+                  // Con llaves: setState no acepta un callback que devuelva
+                  // un Future.
+                  onRetry: () => setState(() {
+                    _guide = WeeklyGuide.load(rootBundle);
+                  }),
                 );
               }
               if (!snapshot.hasData) return const LoadingView();

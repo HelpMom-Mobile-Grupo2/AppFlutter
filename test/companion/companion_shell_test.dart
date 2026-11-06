@@ -6,14 +6,19 @@ import 'package:helpmom_companion/core/app_routes.dart';
 import 'package:helpmom_companion/core/app_theme.dart';
 import 'package:helpmom_companion/core/session_store.dart';
 import 'package:helpmom_companion/features/alerts/bloc/alerts_bloc.dart';
+import 'package:helpmom_companion/features/auth/bloc/auth_bloc.dart';
 import 'package:helpmom_companion/features/companion/cubit/summary_cubit.dart';
 import 'package:helpmom_companion/features/companion/cubit/tips_cubit.dart';
 import 'package:helpmom_companion/features/companion/data/companion_summary.dart';
 import 'package:helpmom_companion/features/companion/ui/companion_shell.dart';
+import 'package:helpmom_companion/features/family/data/family_repository.dart';
+import 'package:helpmom_companion/features/profile/cubit/profile_cubit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../support/fake_alerts_repository.dart';
+import '../support/fake_auth_repository.dart';
 import '../support/fake_companion_repository.dart';
+import '../support/fake_family_repository.dart';
 
 void main() {
   late SessionStore session;
@@ -34,10 +39,20 @@ void main() {
   });
 
   Widget buildApp() {
-    return RepositoryProvider.value(
-      value: session,
+    final familyRepository = FakeFamilyRepository();
+    return MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider.value(value: session),
+        RepositoryProvider<FamilyRepository>.value(value: familyRepository),
+      ],
       child: MultiBlocProvider(
         providers: [
+          BlocProvider(
+            create: (_) => AuthBloc(
+              authRepository: FakeAuthRepository(session),
+              familyRepository: familyRepository,
+            ),
+          ),
           BlocProvider(
             create: (_) => AlertsBloc(alertsRepository: alertsRepository),
           ),
@@ -45,6 +60,7 @@ void main() {
             create: (_) => SummaryCubit(companionRepository)..load(),
           ),
           BlocProvider(create: (_) => TipsCubit(companionRepository)..load()),
+          BlocProvider(create: (_) => ProfileCubit(session)),
         ],
         child: MaterialApp(
           theme: AppTheme.light(useGoogleFonts: false),

@@ -27,6 +27,7 @@ import 'features/family/data/family_api.dart';
 import 'features/family/data/family_repository.dart';
 import 'features/family/ui/link_screen.dart';
 import 'features/family/ui/scanner_screen.dart';
+import 'features/profile/cubit/profile_cubit.dart';
 
 /// Llave global del navegador: permite volver al login desde fuera de un
 /// widget (por ejemplo, cuando el backend responde 401).
@@ -140,6 +141,7 @@ class HelpMomApp extends StatelessWidget {
                   create: (context) =>
                       TipsCubit(context.read<CompanionRepository>())..load(),
                 ),
+                BlocProvider(create: (_) => ProfileCubit(sessionStore)),
               ],
               child: const CompanionShell(),
             ),
