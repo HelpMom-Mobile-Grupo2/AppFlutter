@@ -1,13 +1,57 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:helpmom_companion/core/api_exception.dart';
+import 'package:helpmom_companion/core/app_routes.dart';
 import 'package:helpmom_companion/core/app_theme.dart';
+import 'package:helpmom_companion/core/session_store.dart';
+import 'package:helpmom_companion/features/alerts/bloc/alerts_bloc.dart';
+import 'package:helpmom_companion/features/companion/cubit/summary_cubit.dart';
+import 'package:helpmom_companion/features/companion/cubit/tips_cubit.dart';
+import 'package:helpmom_companion/features/companion/data/companion_summary.dart';
 import 'package:helpmom_companion/features/companion/ui/companion_shell.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../support/fake_alerts_repository.dart';
+import '../support/fake_companion_repository.dart';
 
 void main() {
-  Widget buildApp() => MaterialApp(
-    theme: AppTheme.light(useGoogleFonts: false),
-    home: const CompanionShell(),
-  );
+  late SessionStore session;
+  late FakeAlertsRepository alertsRepository;
+  late FakeCompanionRepository companionRepository;
+
+  setUp(() async {
+    SharedPreferences.setMockInitialValues({});
+    session = await SessionStore.create();
+    await session.saveSession(
+      token: 't',
+      userId: 'u1',
+      fullName: 'Carlos Ruiz',
+      email: 'carlos@mail.com',
+    );
+    alertsRepository = FakeAlertsRepository(alerts: [buildAlert()]);
+    companionRepository = FakeCompanionRepository();
+  });
+
+  Widget buildApp() {
+    return RepositoryProvider.value(
+      value: session,
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (_) => AlertsBloc(repository: alertsRepository)),
+          BlocProvider(
+            create: (_) => SummaryCubit(companionRepository)..load(),
+          ),
+          BlocProvider(create: (_) => TipsCubit(companionRepository)..load()),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.light(useGoogleFonts: false),
+          home: const CompanionShell(),
+          routes: {AppRoutes.link: (_) => const Text('Pantalla Vincular')},
+        ),
+      ),
+    );
+  }
 
   void setScreenSize(WidgetTester tester, Size size) {
     tester.view.physicalSize = size;
@@ -18,6 +62,7 @@ void main() {
   testWidgets('usa NavigationBar con 600 dp o menos', (tester) async {
     setScreenSize(tester, const Size(400, 800));
     await tester.pumpWidget(buildApp());
+    await tester.pumpAndSettle();
 
     expect(find.byType(NavigationBar), findsOneWidget);
     expect(find.byType(NavigationRail), findsNothing);
@@ -36,6 +81,7 @@ void main() {
   testWidgets('usa NavigationRail con más de 600 dp', (tester) async {
     setScreenSize(tester, const Size(1000, 800));
     await tester.pumpWidget(buildApp());
+    await tester.pumpAndSettle();
 
     expect(find.byType(NavigationRail), findsOneWidget);
     expect(find.byType(NavigationBar), findsNothing);
@@ -49,5 +95,77 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(tester.widget<IndexedStack>(find.byType(IndexedStack)).index, 3);
+  });
+
+  testWidgets('Inicio pide pendientes y Alertas pide todas', (tester) async {
+    setScreenSize(tester, const Size(400, 800));
+    await tester.pumpWidget(buildApp());
+    await tester.pumpAndSettle();
+
+    expect(alertsRepository.fetchPendingCalls, 1);
+    expect(alertsRepository.fetchAllCalls, 0);
+
+    await tester.tap(
+      find.descendant(
+        of: find.byType(NavigationBar),
+        matching: find.text('Alertas'),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(alertsRepository.fetchAllCalls, 1);
+  });
+
+  testWidgets('Inicio muestra la alerta activa, el estado y la misión', (
+    tester,
+  ) async {
+    setScreenSize(tester, const Size(400, 2000));
+    await tester.pumpWidget(buildApp());
+    await tester.pumpAndSettle();
+
+    expect(find.text('Modo Compañero · Hola, Carlos'), findsOneWidget);
+    expect(find.text('Daniela Gómez (Sem. 25)'), findsOneWidget);
+    expect(find.text("🔔 Daniela Gómez pulsó 'Pasa la Voz'"), findsOneWidget);
+    expect(find.text('Estado de Daniela Gómez hoy'), findsOneWidget);
+    expect(find.text('Semáforo verde'), findsOneWidget);
+    expect(find.text('Semana 25 · Día 1'), findsOneWidget);
+    expect(find.text('Misión de apoyo de hoy'), findsOneWidget);
+    expect(find.text('Evita que cargue peso o paquetes'), findsOneWidget);
+  });
+
+  testWidgets('estado vacío si no hay embarazo ni mediciones (D.2)', (
+    tester,
+  ) async {
+    setScreenSize(tester, const Size(400, 2000));
+    companionRepository.summary = const CompanionSummary(
+      motherName: 'Daniela Gómez',
+    );
+    alertsRepository.alerts = [];
+    await tester.pumpWidget(buildApp());
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text(
+        'Aún no hay alertas, te avisaremos cuando Daniela Gómez te necesite',
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.textContaining('Aún no hay mediciones de salud'),
+      findsOneWidget,
+    );
+    expect(
+      find.text('Daniela Gómez aún no registró su embarazo.'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('409 "no vinculado" lleva a Vincular', (tester) async {
+    setScreenSize(tester, const Size(400, 800));
+    alertsRepository.fetchError = const NotLinkedException();
+    await tester.pumpWidget(buildApp());
+    await tester.pumpAndSettle();
+
+    expect(find.text('Pantalla Vincular'), findsOneWidget);
   });
 }
