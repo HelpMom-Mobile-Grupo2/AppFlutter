@@ -66,7 +66,8 @@ class MissionList extends StatelessWidget {
                         : null,
                   ),
                   subtitle: showBody ? Text(tip.body) : null,
-                  secondary: tip.done
+                  // En Guía la etiqueta "Hecho" acompaña siempre al check.
+                  secondary: showBody || tip.done
                       ? Text('Hecho', style: theme.textTheme.labelMedium)
                       : null,
                 ),

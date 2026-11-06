@@ -1,0 +1,270 @@
+{
+  "weeks": [
+    {
+      "week": 4,
+      "baby": "El embrión se está implantando en el útero. Es del tamaño de una semilla de amapola.",
+      "mother": "Puede que aún no note nada, o que sienta los senos sensibles y más cansancio.",
+      "howToHelp": "Acompáñala a confirmar el embarazo y celebra la noticia a su ritmo: ella decide cuándo contarlo.",
+      "preparations": "Averigüen dónde hará sus controles prenatales y qué cubre su seguro (SIS, EsSalud o privado)."
+    },
+    {
+      "week": 5,
+      "baby": "Empieza a formarse su corazón. Es del tamaño de una semilla de sésamo.",
+      "mother": "Pueden empezar las náuseas y el cansancio.",
+      "howToHelp": "Ten a mano galletas de soda y agua, y evita olores fuertes en casa, como perfumes o frituras.",
+      "preparations": "Agenden la primera cita de control prenatal."
+    },
+    {
+      "week": 6,
+      "baby": "Su corazón ya late. Es del tamaño de una lenteja.",
+      "mother": "Puede tener náuseas, ganas frecuentes de ir al baño y cambios de ánimo.",
+      "howToHelp": "Ofrécete a cocinar o a pedir comida que le caiga bien, y no te tomes a pecho los cambios de ánimo.",
+      "preparations": "Guarden en una carpeta las citas y los resultados: será la carpeta del embarazo."
+    },
+    {
+      "week": 7,
+      "baby": "Se están formando sus brazos y piernas. Es del tamaño de un arándano.",
+      "mother": "Tiene más sueño y algunos olores le pueden dar asco.",
+      "howToHelp": "Encárgate de sacar la basura y de limpiar el baño o la cocina si los olores la marean.",
+      "preparations": "Anoten en el celular las fechas de los próximos controles."
+    },
+    {
+      "week": 8,
+      "baby": "Ya se mueve, aunque ella todavía no lo siente. Es del tamaño de una frambuesa.",
+      "mother": "La ropa empieza a apretar en la cintura y puede sentirse hinchada.",
+      "howToHelp": "Acompáñala a su control. Llevar las preguntas anotadas ayuda a no olvidarlas.",
+      "preparations": "Pregunten en el control qué análisis le tocan en este trimestre."
+    },
+    {
+      "week": 9,
+      "baby": "Sus órganos principales se siguen formando. Es del tamaño de una cereza.",
+      "mother": "Las náuseas pueden estar en su punto más fuerte.",
+      "howToHelp": "Prepara comidas pequeñas y frecuentes, para que no pase mucho tiempo con el estómago vacío.",
+      "preparations": "Revisen el presupuesto del mes: controles, vitaminas y ropa cómoda."
+    },
+    {
+      "week": 10,
+      "baby": "Deja de ser embrión y pasa a ser feto. Es del tamaño de una fresa.",
+      "mother": "Siguen el cansancio y los cambios de ánimo. Puede llorar o irritarse más fácil.",
+      "howToHelp": "Escúchala sin intentar arreglarlo todo: a veces solo necesita desahogarse.",
+      "preparations": "Hablen de cuándo y cómo darán la noticia a la familia y en el trabajo."
+    },
+    {
+      "week": 11,
+      "baby": "Se forman sus uñas y ya puede abrir y cerrar las manos. Es del tamaño de un higo.",
+      "mother": "Algunas mujeres empiezan a sentir menos náuseas.",
+      "howToHelp": "Salgan a caminar juntos un rato: el movimiento suave le hace bien.",
+      "preparations": "Pregunten por la ecografía del primer trimestre si aún no la tienen programada."
+    },
+    {
+      "week": 12,
+      "baby": "Ya tiene reflejos: si algo lo roza, se mueve. Es del tamaño de una lima.",
+      "mother": "Puede notar más energía, y el útero empieza a subir.",
+      "howToHelp": "Acompáñala a la ecografía: es un momento para vivirlo juntos.",
+      "preparations": "Empiecen una lista con los nombres que les gusten a los dos."
+    },
+    {
+      "week": 13,
+      "baby": "Ya tiene huellas digitales. Es del tamaño de un limón.",
+      "mother": "Termina el primer trimestre, y para muchas es un alivio.",
+      "howToHelp": "Planea algo sencillo para celebrar el fin del primer trimestre.",
+      "preparations": "Consulten en sus trabajos cómo funcionan la licencia por maternidad y la de paternidad."
+    },
+    {
+      "week": 14,
+      "baby": "Ya puede hacer muecas con la cara. Es del tamaño de un durazno.",
+      "mother": "Empieza el segundo trimestre: suele tener más energía y apetito.",
+      "howToHelp": "Cocinen juntos platos nutritivos con menestras, verduras y frutas.",
+      "preparations": "Hagan una lista de lo que necesitará el bebé y de lo que les pueden prestar."
+    },
+    {
+      "week": 15,
+      "baby": "Ya percibe la luz, aunque tiene los ojos cerrados. Es del tamaño de una manzana.",
+      "mother": "Puede tener la nariz congestionada o sangrado leve de encías al cepillarse.",
+      "howToHelp": "Recuérdale tomar agua y déjale una botella llena siempre a la mano.",
+      "preparations": "Pregunten en el control si conviene una visita al dentista."
+    },
+    {
+      "week": 16,
+      "baby": "Empieza a escuchar sonidos. Es del tamaño de una palta.",
+      "mother": "La barriga ya se nota más y puede necesitar ropa más holgada.",
+      "howToHelp": "Acompáñala a comprar ropa cómoda, o préstale tus polos más grandes.",
+      "preparations": "Separen un espacio en casa para las cosas del bebé."
+    },
+    {
+      "week": 17,
+      "baby": "Empieza a acumular grasa bajo la piel. Es del tamaño de una granada.",
+      "mother": "Puede sentir tirones a los costados de la barriga al moverse, porque el útero crece.",
+      "howToHelp": "Ayúdala a levantarse despacio de la cama o del sillón.",
+      "preparations": "Busquen información sobre talleres de psicoprofilaxis (preparación para el parto)."
+    },
+    {
+      "week": 18,
+      "baby": "Ya escucha voces. Es del tamaño de un camote.",
+      "mother": "Puede sentir los primeros movimientos del bebé, como burbujitas.",
+      "howToHelp": "Háblale al bebé: ya puede empezar a reconocer tu voz.",
+      "preparations": "Pregunten por la ecografía del segundo trimestre."
+    },
+    {
+      "week": 19,
+      "baby": "Su piel se cubre con una capa que la protege. Es del tamaño de un mango.",
+      "mother": "Puede tener dolor de espalda y calambres en las piernas.",
+      "howToHelp": "Ofrécele un masaje suave en la espalda o en las piernas antes de dormir.",
+      "preparations": "Consigan una almohada extra para que pueda dormir de costado más cómoda."
+    },
+    {
+      "week": 20,
+      "baby": "Llegaron a la mitad del camino. Es del tamaño de un plátano.",
+      "mother": "El ombligo puede empezar a salir hacia afuera.",
+      "howToHelp": "Celebren la mitad del embarazo y cuéntale qué es lo que más te emociona.",
+      "preparations": "Hagan la lista de lo básico: pañales, ropa, un lugar seguro para dormir y una silla para el auto."
+    },
+    {
+      "week": 21,
+      "baby": "Ya traga y practica la digestión. Es del tamaño de una zanahoria.",
+      "mother": "Puede tener acidez después de comer.",
+      "howToHelp": "Evita las comidas muy grasosas o picantes, y ayúdala a no acostarse justo después de comer.",
+      "preparations": "Comparen precios de cuna o moisés y del coche."
+    },
+    {
+      "week": 22,
+      "baby": "Sus sentidos siguen desarrollándose: ya siente el tacto. Es del tamaño de una papaya pequeña.",
+      "mother": "Pueden hinchársele un poco los pies y los tobillos.",
+      "howToHelp": "Que ponga los pies en alto un rato, y tú encárgate de alcanzarle lo que necesite.",
+      "preparations": "Decidan juntos en qué hospital o clínica será el parto."
+    },
+    {
+      "week": 23,
+      "baby": "Escucha los sonidos fuertes de afuera, como la música o el tráfico. Es del tamaño de una toronja.",
+      "mother": "Puede costarle encontrar una posición cómoda para dormir.",
+      "howToHelp": "Hazte cargo de las tareas pesadas de la casa, como barrer o cargar las compras.",
+      "preparations": "Inscríbanse en el taller de psicoprofilaxis si aún no lo hicieron."
+    },
+    {
+      "week": 24,
+      "baby": "Sus pulmones se siguen desarrollando. Es del tamaño de un choclo.",
+      "mother": "En estas semanas suelen pedirle algunos análisis de control.",
+      "howToHelp": "Acompáñala a sus análisis y llévale algo de comer para después.",
+      "preparations": "Revisen qué documentos pide el hospital para el día del parto."
+    },
+    {
+      "week": 25,
+      "baby": "Reacciona a tu voz y puede moverse cuando la escucha. Es del tamaño de una coliflor.",
+      "mother": "Puede sentirse más torpe o con menos equilibrio por el peso de la barriga.",
+      "howToHelp": "Evita que cargue peso o paquetes: ofrécete siempre a llevarlos tú.",
+      "preparations": "Empiecen a lavar y ordenar la ropita del bebé."
+    },
+    {
+      "week": 26,
+      "baby": "Empieza a abrir los ojos. Es del tamaño de una lechuga.",
+      "mother": "Puede dormir mal y despertarse de noche para ir al baño.",
+      "howToHelp": "Ten paciencia con las noches inquietas y, si se puede, déjala dormir un poco más en la mañana.",
+      "preparations": "Piensen en quién los podrá ayudar en las primeras semanas después del parto."
+    },
+    {
+      "week": 27,
+      "baby": "Termina el segundo trimestre. Duerme y despierta por ratos. Es del tamaño de un repollo.",
+      "mother": "Puede sentir contracciones suaves e irregulares, como de práctica, que no suelen doler mucho.",
+      "howToHelp": "Si se siente incómoda, ayúdala a descansar y a cambiar de posición.",
+      "preparations": "Anoten los teléfonos importantes: el hospital, su médico y el 106."
+    },
+    {
+      "week": 28,
+      "baby": "Empieza el tercer trimestre. Ya abre y cierra los ojos. Es del tamaño de una berenjena.",
+      "mother": "Vuelve el cansancio, y los controles serán más seguidos.",
+      "howToHelp": "Acompáñala a los controles, que desde ahora serán más frecuentes.",
+      "preparations": "Empiecen a armar el bolso para el hospital."
+    },
+    {
+      "week": 29,
+      "baby": "Sus huesos se hacen más fuertes. Es del tamaño de una calabaza pequeña.",
+      "mother": "Puede quedarse sin aire al subir escaleras.",
+      "howToHelp": "Caminen a su ritmo y ofrécete a hacer los mandados que tengan escaleras.",
+      "preparations": "Bolso de ella: ropa cómoda, pijama que abra adelante, útiles de aseo y sandalias."
+    },
+    {
+      "week": 30,
+      "baby": "Gana grasa y su cerebro crece rápido. Es del tamaño de una col grande.",
+      "mother": "Puede volver la acidez, y le cuesta comer mucho de una vez.",
+      "howToHelp": "Prepárale comidas pequeñas y frecuentes.",
+      "preparations": "Bolso del bebé: pañales de recién nacido, ropita, gorrito, medias y una manta."
+    },
+    {
+      "week": 31,
+      "baby": "Se mueve mucho y ya gira la cabeza. Es del tamaño de un coco.",
+      "mother": "Puede tener más dolor de espalda y de cadera.",
+      "howToHelp": "Un masaje en la espalda baja o una compresa tibia pueden aliviarla.",
+      "preparations": "Guarden en el bolso la carpeta del embarazo con su DNI y los resultados."
+    },
+    {
+      "week": 32,
+      "baby": "Practica los movimientos de respirar y se chupa el dedo. Es del tamaño de una piña pequeña.",
+      "mother": "Puede sentir más contracciones de práctica.",
+      "howToHelp": "Aprendan juntos a reconocer las contracciones de verdad, en el taller o con su médico.",
+      "preparations": "Prueben la ruta al hospital y calculen cuánto demoran en llegar."
+    },
+    {
+      "week": 33,
+      "baby": "Sus defensas se fortalecen. Es del tamaño de una piña.",
+      "mother": "Puede sentir ansiedad por el parto.",
+      "howToHelp": "Hablen de sus miedos sin minimizarlos y recuérdale que estarán juntos.",
+      "preparations": "Consigan la silla del bebé para el auto o el taxi."
+    },
+    {
+      "week": 34,
+      "baby": "Sus pulmones están casi listos. Es del tamaño de un melón.",
+      "mother": "Puede estar más olvidadiza y cansarse rápido.",
+      "howToHelp": "Ayúdala con recordatorios de citas y pendientes.",
+      "preparations": "Dejen el bolso listo cerca de la puerta."
+    },
+    {
+      "week": 35,
+      "baby": "Ya casi no tiene espacio para moverse, pero se sigue sintiendo. Es del tamaño de una papaya grande.",
+      "mother": "Necesita ir al baño muy seguido y le cuesta más dormir.",
+      "howToHelp": "Encárgate de las tareas de la casa en las que haya que agacharse.",
+      "preparations": "Organicen quién cuidará la casa o a las mascotas cuando vayan al hospital."
+    },
+    {
+      "week": 36,
+      "baby": "Puede empezar a bajar hacia la pelvis. Es del tamaño de una lechuga romana grande.",
+      "mother": "Si el bebé baja, puede respirar mejor, pero sentir más presión abajo.",
+      "howToHelp": "Ten el celular siempre con batería y saldo: ella puede llamarte en cualquier momento.",
+      "preparations": "Repasen el plan para el día del parto: quién avisa, quién maneja y qué llevan."
+    },
+    {
+      "week": 37,
+      "baby": "Ya está a término temprano y sigue ganando peso. Es del tamaño de un zapallo.",
+      "mother": "Pueden aparecer señales de que se acerca el parto; su médico le dirá cuáles vigilar.",
+      "howToHelp": "Mantén la calma y ten a mano la lista de señales de alarma que les dio su médico.",
+      "preparations": "Revisen otra vez el bolso y la carpeta con los documentos."
+    },
+    {
+      "week": 38,
+      "baby": "Practica el reflejo de succión para poder lactar. Es del tamaño de una sandía pequeña.",
+      "mother": "Puede sentirse impaciente y muy incómoda.",
+      "howToHelp": "Distráiganse juntos: una película, un paseo corto o una comida rica.",
+      "preparations": "Averigüen cómo se tramita en el hospital el Certificado de Nacido Vivo."
+    },
+    {
+      "week": 39,
+      "baby": "Está listo para nacer en cualquier momento. Es del tamaño de una sandía.",
+      "mother": "Cualquier día puede empezar el trabajo de parto.",
+      "howToHelp": "Si empiezan las contracciones, ayúdala a medir cada cuánto vienen y sigan las indicaciones de su médico.",
+      "preparations": "Después del parto, inscriban al bebé en RENIEC para su DNI y en el seguro."
+    },
+    {
+      "week": 40,
+      "baby": "Llegó la fecha probable de parto; muchos bebés nacen unos días antes o después. Es del tamaño de una sandía grande.",
+      "mother": "Puede sentirse ansiosa si el bebé no llega. Pasarse unos días es normal.",
+      "howToHelp": "Responde tú los mensajes de la familia para que ella pueda descansar.",
+      "preparations": "Coordinen los controles que indique su médico si pasa la fecha."
+    },
+    {
+      "week": 41,
+      "baby": "Sigue creciendo mientras espera su momento.",
+      "mother": "Su médico los vigilará de cerca a ella y al bebé.",
+      "howToHelp": "Acompáñala a todos los controles y deja el bolso listo junto a la puerta.",
+      "preparations": "Tengan claro quién los ayudará en casa durante los primeros días."
+    }
+  ]
+}
