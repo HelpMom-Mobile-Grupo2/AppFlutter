@@ -3,14 +3,14 @@ import 'family_api.dart';
 import 'family_models.dart';
 
 class FamilyRepository {
-  FamilyRepository({required FamilyApi api}) : _api = api;
+  FamilyRepository({required this.api});
 
-  final FamilyApi _api;
+  final FamilyApi api;
 
   /// Grupo familiar del acompañante, o null si aún no está vinculado (404).
   Future<FamilyGroup?> getFamily() async {
     try {
-      return await _api.getFamily();
+      return await api.getFamily();
     } on ApiException catch (e) {
       if (e.statusCode == 404) return null;
       rethrow;
@@ -18,5 +18,5 @@ class FamilyRepository {
   }
 
   Future<JoinFamilyResult> join(String code) =>
-      _api.join(InvitationCode.normalize(code));
+      api.join(InvitationCode.normalize(code));
 }

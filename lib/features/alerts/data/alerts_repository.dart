@@ -5,26 +5,24 @@ import 'alerts_api.dart';
 /// Alertas del grupo familiar. La lista completa se guarda en sqflite para
 /// mostrarla sin conexión.
 class AlertsRepository {
-  AlertsRepository({required AlertsApi api, required LocalDb localDb})
-    : _api = api,
-      _localDb = localDb;
+  AlertsRepository({required this.api, required this.localDb});
 
-  final AlertsApi _api;
-  final LocalDb _localDb;
+  final AlertsApi api;
+  final LocalDb localDb;
 
   /// Todas las alertas (bandeja). Reemplaza la caché.
   Future<List<QuickAlert>> fetchAll() async {
-    final alerts = _newestFirst(await _api.getAlerts());
-    await _localDb.replaceAll(LocalDb.alertsTable, alerts.map(_toRow).toList());
+    final alerts = _newestFirst(await api.getAlerts());
+    await localDb.replaceAll(LocalDb.alertsTable, alerts.map(_toRow).toList());
     return alerts;
   }
 
   /// Solo las pendientes (Inicio). No toca la caché, que guarda todas.
   Future<List<QuickAlert>> fetchPending() async =>
-      _newestFirst(await _api.getAlerts(pendingOnly: true));
+      _newestFirst(await api.getAlerts(pendingOnly: true));
 
   Future<List<QuickAlert>> cachedAlerts() async {
-    final rows = await _localDb.queryAll(
+    final rows = await localDb.queryAll(
       LocalDb.alertsTable,
       orderBy: 'created_at DESC',
     );
@@ -32,8 +30,8 @@ class AlertsRepository {
   }
 
   Future<QuickAlert> respond(String alertId, AlertResponse response) async {
-    final updated = await _api.respond(alertId, response);
-    await _localDb.update(LocalDb.alertsTable, alertId, _toRow(updated));
+    final updated = await api.respond(alertId, response);
+    await localDb.update(LocalDb.alertsTable, alertId, _toRow(updated));
     return updated;
   }
 

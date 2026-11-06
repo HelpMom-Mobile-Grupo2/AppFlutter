@@ -1,4 +1,6 @@
+import 'package:helpmom_companion/core/local_db.dart';
 import 'package:helpmom_companion/features/alerts/data/alert_model.dart';
+import 'package:helpmom_companion/features/alerts/data/alerts_api.dart';
 import 'package:helpmom_companion/features/alerts/data/alerts_repository.dart';
 
 /// Alerta de ejemplo creada [minutesAgo] minutos antes de [baseTime].
@@ -41,6 +43,13 @@ class FakeAlertsRepository implements AlertsRepository {
   int fetchAllCalls = 0;
   int fetchPendingCalls = 0;
   final respondCalls = <(String, AlertResponse)>[];
+
+  // El fake no usa la API ni sqflite.
+  @override
+  AlertsApi get api => throw UnimplementedError();
+
+  @override
+  LocalDb get localDb => throw UnimplementedError();
 
   @override
   Future<List<QuickAlert>> fetchAll() async {

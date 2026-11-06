@@ -1,3 +1,5 @@
+import 'package:helpmom_companion/core/local_db.dart';
+import 'package:helpmom_companion/features/companion/data/companion_api.dart';
 import 'package:helpmom_companion/features/companion/data/companion_repository.dart';
 import 'package:helpmom_companion/features/companion/data/companion_summary.dart';
 import 'package:helpmom_companion/features/companion/data/daily_tip.dart';
@@ -43,6 +45,13 @@ class FakeCompanionRepository implements CompanionRepository {
   List<DailyTip> cached = [];
   Object? error;
   Object? markDoneError;
+
+  // El fake no usa la API ni sqflite.
+  @override
+  CompanionApi get api => throw UnimplementedError();
+
+  @override
+  LocalDb get localDb => throw UnimplementedError();
 
   @override
   Future<CompanionSummary> getSummary() async {
