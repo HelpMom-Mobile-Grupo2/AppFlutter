@@ -20,7 +20,7 @@ void main() {
   setUp(() {
     repository = FakeAlertsRepository(alerts: [pending, older]);
     bloc = AlertsBloc(
-      repository: repository,
+      alertsRepository: repository,
       pollInterval: const Duration(hours: 1),
     );
   });
@@ -165,12 +165,21 @@ void main() {
     expect(state.all, [pending, older]);
   });
 
+  test('refresh termina aunque no cambie nada (pull-to-refresh)', () async {
+    await loadHome();
+
+    // Mismos datos: el bloc no emite un estado nuevo, pero el Future termina.
+    await bloc.refresh(AlertsView.home).timeout(const Duration(seconds: 1));
+
+    expect(repository.fetchPendingCalls, 2);
+  });
+
   group('polling', () {
     late AlertsBloc pollingBloc;
 
     setUp(() {
       pollingBloc = AlertsBloc(
-        repository: repository,
+        alertsRepository: repository,
         pollInterval: const Duration(milliseconds: 20),
       );
     });
@@ -201,7 +210,7 @@ void main() {
 
     test('con el toggle de alertas apagado no hay polling', () async {
       final quietBloc = AlertsBloc(
-        repository: repository,
+        alertsRepository: repository,
         pollingEnabled: () => false,
         pollInterval: const Duration(milliseconds: 20),
       );

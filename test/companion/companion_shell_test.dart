@@ -38,7 +38,9 @@ void main() {
       value: session,
       child: MultiBlocProvider(
         providers: [
-          BlocProvider(create: (_) => AlertsBloc(repository: alertsRepository)),
+          BlocProvider(
+            create: (_) => AlertsBloc(alertsRepository: alertsRepository),
+          ),
           BlocProvider(
             create: (_) => SummaryCubit(companionRepository)..load(),
           ),

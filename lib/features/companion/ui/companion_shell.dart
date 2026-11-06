@@ -25,6 +25,8 @@ const _destinations = [
   _Destination('Perfil', Icons.person_outline, Icons.person),
 ];
 
+const _pages = [HomeScreen(), AlertsScreen(), GuideScreen(), ProfileScreen()];
+
 /// Contenedor de las 4 pestañas. Con 600 dp o menos usa NavigationBar abajo;
 /// con más ancho, NavigationRail a la izquierda.
 ///
@@ -134,11 +136,11 @@ class _CompanionShellState extends State<CompanionShell> {
           final pages = IndexedStack(
             key: _pagesKey,
             index: _index,
-            children: const [
-              HomeScreen(),
-              AlertsScreen(),
-              GuideScreen(),
-              ProfileScreen(),
+            children: [
+              // TickerMode pausa las animaciones (por ejemplo, un indicador
+              // de carga) de las pestañas que no se ven.
+              for (final (i, page) in _pages.indexed)
+                TickerMode(enabled: i == _index, child: page),
             ],
           );
 

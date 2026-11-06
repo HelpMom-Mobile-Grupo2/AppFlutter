@@ -128,7 +128,7 @@ class HelpMomApp extends StatelessWidget {
               providers: [
                 BlocProvider(
                   create: (context) => AlertsBloc(
-                    repository: context.read<AlertsRepository>(),
+                    alertsRepository: context.read<AlertsRepository>(),
                     pollingEnabled: () => sessionStore.alertNotifications,
                   ),
                 ),

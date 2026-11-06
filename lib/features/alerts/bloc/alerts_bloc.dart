@@ -14,18 +14,23 @@ part 'alerts_state.dart';
 /// de esas pestañas está visible y la app está en primer plano.
 class AlertsBloc extends Bloc<AlertsEvent, AlertsState> {
   AlertsBloc({
-    required AlertsRepository repository,
+    required AlertsRepository alertsRepository,
     bool Function()? pollingEnabled,
     this.pollInterval = const Duration(seconds: 15),
-  }) : _repository = repository,
+  }) : _repository = alertsRepository,
        _pollingEnabled = pollingEnabled ?? (() => true),
        super(const AlertsState()) {
     on<AlertsVisibilityChanged>(_onVisibilityChanged);
-    on<AlertsRefreshRequested>(
-      (event, emit) => _load(event.view, emit, silent: _hasData(event.view)),
-    );
+    on<AlertsRefreshRequested>(_onRefreshRequested);
     on<_AlertsPollTicked>(_onPollTicked);
     on<AlertResponded>(_onAlertResponded);
+  }
+
+  /// Recarga [view] y termina cuando llega la respuesta (pull-to-refresh).
+  Future<void> refresh(AlertsView view) {
+    final completer = Completer<void>();
+    add(AlertsRefreshRequested(view, completer: completer));
+    return completer.future;
   }
 
   final AlertsRepository _repository;
@@ -58,6 +63,17 @@ class AlertsBloc extends Bloc<AlertsEvent, AlertsState> {
       );
     }
     await _load(view, emit, silent: _hasData(view));
+  }
+
+  Future<void> _onRefreshRequested(
+    AlertsRefreshRequested event,
+    Emitter<AlertsState> emit,
+  ) async {
+    try {
+      await _load(event.view, emit, silent: _hasData(event.view));
+    } finally {
+      event.completer?.complete();
+    }
   }
 
   Future<void> _onPollTicked(

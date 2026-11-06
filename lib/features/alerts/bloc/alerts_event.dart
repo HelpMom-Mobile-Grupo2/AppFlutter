@@ -23,9 +23,12 @@ final class AlertsVisibilityChanged extends AlertsEvent {
 
 /// Pull-to-refresh o "Reintentar".
 final class AlertsRefreshRequested extends AlertsEvent {
-  const AlertsRefreshRequested(this.view);
+  const AlertsRefreshRequested(this.view, {this.completer});
 
   final AlertsView view;
+
+  /// Se completa al terminar la carga (lo espera el RefreshIndicator).
+  final Completer<void>? completer;
 
   @override
   List<Object?> get props => [view];

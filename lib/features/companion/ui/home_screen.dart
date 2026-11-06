@@ -8,6 +8,7 @@ import '../../../core/widgets/error_view.dart';
 import '../../../core/widgets/loading_view.dart';
 import '../../../core/widgets/offline_banner.dart';
 import '../../alerts/bloc/alerts_bloc.dart';
+import '../../alerts/ui/alert_actions.dart';
 import '../../alerts/ui/alert_card.dart';
 import '../cubit/summary_cubit.dart';
 import '../cubit/tips_cubit.dart';
@@ -20,10 +21,8 @@ class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   Future<void> _refresh(BuildContext context) async {
-    context.read<AlertsBloc>().add(
-      const AlertsRefreshRequested(AlertsView.home),
-    );
     await Future.wait([
+      context.read<AlertsBloc>().refresh(AlertsView.home),
       context.read<SummaryCubit>().load(),
       context.read<TipsCubit>().load(),
     ]);
@@ -140,9 +139,8 @@ class _ActiveAlertSection extends StatelessWidget {
           return AlertCard(
             alert: alert,
             motherName: motherName,
-            onRespond: (response) => context.read<AlertsBloc>().add(
-              AlertResponded(alert.id, response),
-            ),
+            onRespond: (response) =>
+                respondToAlert(context, alert.id, response),
             onCallMother: () => callMother(context, motherName),
             onCallEmergency: () => callEmergency(context),
           );
