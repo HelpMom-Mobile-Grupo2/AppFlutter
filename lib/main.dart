@@ -7,8 +7,18 @@ import 'core/app_theme.dart';
 import 'core/local_db.dart';
 import 'core/session_store.dart';
 import 'core/widgets/waking_server_banner.dart';
+import 'features/auth/bloc/auth_bloc.dart';
+import 'features/auth/data/auth_api.dart';
+import 'features/auth/data/auth_repository.dart';
+import 'features/auth/ui/login_screen.dart';
 import 'features/auth/ui/splash_screen.dart';
+import 'features/auth/ui/terms_screen.dart';
 import 'features/companion/ui/companion_shell.dart';
+import 'features/family/cubit/link_cubit.dart';
+import 'features/family/data/family_api.dart';
+import 'features/family/data/family_repository.dart';
+import 'features/family/ui/link_screen.dart';
+import 'features/family/ui/scanner_screen.dart';
 
 /// Llave global del navegador: permite volver al login desde fuera de un
 /// widget (por ejemplo, cuando el backend responde 401).
@@ -23,9 +33,8 @@ Future<void> main() async {
     sessionStore: sessionStore,
     onUnauthorized: () async {
       await localDb.clear();
-      // El Splash decide a dónde ir (sin token, al login).
       navigatorKey.currentState?.pushNamedAndRemoveUntil(
-        AppRoutes.splash,
+        AppRoutes.login,
         (_) => false,
       );
     },
@@ -59,22 +68,48 @@ class HelpMomApp extends StatelessWidget {
         RepositoryProvider.value(value: sessionStore),
         RepositoryProvider.value(value: localDb),
         RepositoryProvider.value(value: apiClient),
+        RepositoryProvider(
+          create: (_) => AuthRepository(
+            api: AuthApi(apiClient),
+            session: sessionStore,
+            localDb: localDb,
+          ),
+        ),
+        RepositoryProvider(
+          create: (_) => FamilyRepository(api: FamilyApi(apiClient)),
+        ),
       ],
-      child: MaterialApp(
-        title: 'HelpMom Compañero',
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.light(),
-        navigatorKey: navigatorKey,
-        initialRoute: AppRoutes.splash,
-        routes: {
-          AppRoutes.splash: (_) => const SplashScreen(),
-          AppRoutes.home: (_) => const CompanionShell(),
-        },
-        builder: (context, child) => Stack(
-          children: [
-            child!,
-            WakingServerBanner(isWaking: apiClient.isWakingServer),
-          ],
+      child: BlocProvider(
+        create: (context) => AuthBloc(
+          authRepository: context.read<AuthRepository>(),
+          familyRepository: context.read<FamilyRepository>(),
+        ),
+        child: MaterialApp(
+          title: 'HelpMom Compañero',
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.light(),
+          navigatorKey: navigatorKey,
+          initialRoute: AppRoutes.splash,
+          routes: {
+            AppRoutes.splash: (_) => const SplashScreen(),
+            AppRoutes.terms: (context) => TermsScreen(
+              // Desde Perfil se abre con `arguments: true` (solo lectura).
+              readOnly: ModalRoute.of(context)?.settings.arguments == true,
+            ),
+            AppRoutes.login: (_) => const LoginScreen(),
+            AppRoutes.link: (context) => BlocProvider(
+              create: (context) => LinkCubit(context.read<FamilyRepository>()),
+              child: const LinkScreen(),
+            ),
+            AppRoutes.scanner: (_) => const ScannerScreen(),
+            AppRoutes.home: (_) => const CompanionShell(),
+          },
+          builder: (context, child) => Stack(
+            children: [
+              child!,
+              WakingServerBanner(isWaking: apiClient.isWakingServer),
+            ],
+          ),
         ),
       ),
     );
