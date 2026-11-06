@@ -4,12 +4,13 @@ import 'auth_api.dart';
 import 'auth_models.dart';
 
 class AuthRepository {
-  // `this._api` en un parámetro con nombre (Dart 3.13): se pasa como `api:`.
   AuthRepository({
-    required this._api,
-    required this._session,
-    required this._localDb,
-  });
+    required AuthApi api,
+    required SessionStore session,
+    required LocalDb localDb,
+  }) : _api = api,
+       _session = session,
+       _localDb = localDb;
 
   final AuthApi _api;
   final SessionStore _session;

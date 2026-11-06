@@ -3,7 +3,7 @@ import 'family_api.dart';
 import 'family_models.dart';
 
 class FamilyRepository {
-  FamilyRepository({required this._api});
+  FamilyRepository({required FamilyApi api}) : _api = api;
 
   final FamilyApi _api;
 

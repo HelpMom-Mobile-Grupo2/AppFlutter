@@ -33,6 +33,10 @@ linter:
   rules:
     # avoid_print: false  # Uncomment to disable the `avoid_print` rule
     # prefer_single_quotes: true  # Uncomment to enable the `prefer_single_quotes` rule
+    # Usamos la forma clásica `({required FamilyApi api}) : _api = api`
+    # en lugar de los parámetros con nombre privados de Dart 3.13
+    # (`required this._api`), por ser más fácil de explicar en clase.
+    prefer_initializing_formals: false
 
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options
