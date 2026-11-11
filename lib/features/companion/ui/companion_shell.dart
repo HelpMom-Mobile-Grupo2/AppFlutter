@@ -1,9 +1,15 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/app_routes.dart';
+import '../../../core/phone_launcher.dart';
 import '../../alerts/bloc/alerts_bloc.dart';
+import '../../alerts/data/alert_model.dart';
+import '../../alerts/ui/alert_actions.dart';
 import '../../alerts/ui/alerts_screen.dart';
+import '../../alerts/ui/sos_dialog.dart';
 import '../../profile/ui/profile_screen.dart';
 import '../cubit/summary_cubit.dart';
 import '../cubit/tips_cubit.dart';
@@ -32,10 +38,20 @@ const _pages = [HomeScreen(), AlertsScreen(), GuideScreen(), ProfileScreen()];
 ///
 /// También avisa al AlertsBloc qué pestaña se ve, para que el polling corra
 /// solo con Inicio o Alertas en pantalla y la app en primer plano.
+///
+/// Además, cada [refreshInterval] pide las alertas pendientes y el resumen
+/// (en cualquier pestaña) para que una SOS nueva abra su aviso sin tener que
+/// deslizar. Solo mientras la app está abierta: no hay servicios en segundo
+/// plano.
 class CompanionShell extends StatefulWidget {
-  const CompanionShell({super.key});
+  const CompanionShell({
+    super.key,
+    this.refreshInterval = const Duration(seconds: 15),
+  });
 
   static const breakpoint = 600.0;
+
+  final Duration refreshInterval;
 
   @override
   State<CompanionShell> createState() => _CompanionShellState();
@@ -46,9 +62,11 @@ class _CompanionShellState extends State<CompanionShell> {
   // cuando el IndexedStack cambia de lugar en el árbol.
   final _pagesKey = GlobalKey();
   late final AppLifecycleListener _lifecycleListener;
+  Timer? _refreshTimer;
   int _index = 0;
   bool _appVisible = true;
   bool _leaving = false;
+  bool _sosDialogOpen = false;
 
   @override
   void initState() {
@@ -58,12 +76,22 @@ class _CompanionShellState extends State<CompanionShell> {
       onHide: () => _setAppVisible(false),
     );
     _notifyAlertsView();
+    _refreshTimer = Timer.periodic(widget.refreshInterval, (_) => _refresh());
   }
 
   @override
   void dispose() {
+    _refreshTimer?.cancel();
     _lifecycleListener.dispose();
     super.dispose();
+  }
+
+  void _refresh() {
+    if (!_appVisible) return;
+    context.read<AlertsBloc>().add(
+      const AlertsRefreshRequested(AlertsView.home),
+    );
+    context.read<SummaryCubit>().load();
   }
 
   void _setAppVisible(bool visible) {
@@ -94,6 +122,39 @@ class _CompanionShellState extends State<CompanionShell> {
     Navigator.pushReplacementNamed(context, AppRoutes.link);
   }
 
+  /// Aviso rojo de pantalla completa. Si ya hay uno abierto, no se apila
+  /// otro: la SOS más nueva igual queda primera en Inicio.
+  Future<void> _showSosDialog(QuickAlert alert) async {
+    if (_sosDialogOpen) return;
+    _sosDialogOpen = true;
+
+    // El diálogo está en otra ruta y no ve los providers de esta pantalla,
+    // por eso se le pasa el cubit con bloc:. Así el nombre aparece aunque el
+    // resumen termine de cargar después.
+    final summaryCubit = context.read<SummaryCubit>();
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => BlocBuilder<SummaryCubit, SummaryState>(
+        bloc: summaryCubit,
+        builder: (_, summary) {
+          final motherName = summary is SummaryLoaded
+              ? summary.summary.motherName
+              : 'Tu pareja';
+          return SosDialog(
+            alert: alert,
+            motherName: motherName,
+            onOnMyWay: () =>
+                respondToAlert(context, alert.id, AlertResponse.onMyWay),
+            onCallMother: () => callMother(context, motherName),
+            onCallEmergency: () => callEmergency(context),
+          );
+        },
+      ),
+    );
+    _sosDialogOpen = false;
+  }
+
   void _showMessage(String message) {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
@@ -116,6 +177,10 @@ class _CompanionShellState extends State<CompanionShell> {
         BlocListener<TipsCubit, TipsState>(
           listenWhen: (_, current) => current is TipsNotLinked,
           listener: (_, _) => _goToLink(),
+        ),
+        BlocListener<AlertsBloc, AlertsState>(
+          listenWhen: (_, current) => current.newSos != null,
+          listener: (_, state) => _showSosDialog(state.newSos!),
         ),
         BlocListener<AlertsBloc, AlertsState>(
           listenWhen: (_, current) => current.actionError != null,

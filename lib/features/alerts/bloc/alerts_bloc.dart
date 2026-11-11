@@ -45,6 +45,9 @@ class AlertsBloc extends Bloc<AlertsEvent, AlertsState> {
   /// Alertas con una respuesta en camino: el polling no las pisa.
   final _respondingIds = <String>{};
 
+  /// SOS pendientes que ya se avisaron: el aviso sale una sola vez por alerta.
+  final _notifiedSosIds = <String>{};
+
   Future<void> _onVisibilityChanged(
     AlertsVisibilityChanged event,
     Emitter<AlertsState> emit,
@@ -97,7 +100,14 @@ class AlertsBloc extends Bloc<AlertsEvent, AlertsState> {
       final alerts = view == AlertsView.home
           ? await _repository.fetchPending()
           : await _repository.fetchAll();
-      emit(_withAlerts(view, _keepResponding(alerts), isOffline: false));
+      emit(
+        _withAlerts(
+          view,
+          _keepResponding(alerts),
+          isOffline: false,
+          newSos: _takeNewSos(alerts),
+        ),
+      );
     } on NotLinkedException {
       emit(state.copyWith(notLinked: true));
     } on UnauthorizedException {
@@ -159,6 +169,18 @@ class AlertsBloc extends Bloc<AlertsEvent, AlertsState> {
     return null;
   }
 
+  /// La SOS pendiente más reciente que todavía no se avisó, o null.
+  QuickAlert? _takeNewSos(List<QuickAlert> alerts) {
+    QuickAlert? newSos;
+    for (final alert in alerts) {
+      // add devuelve false si el id ya estaba en el conjunto.
+      if (alert.isSos && alert.isPending && _notifiedSosIds.add(alert.id)) {
+        newSos ??= alert;
+      }
+    }
+    return newSos;
+  }
+
   /// Si una alerta se está respondiendo, se queda la versión local.
   List<QuickAlert> _keepResponding(List<QuickAlert> fetched) => [
     for (final alert in fetched)
@@ -179,17 +201,20 @@ class AlertsBloc extends Bloc<AlertsEvent, AlertsState> {
     AlertsView view,
     List<QuickAlert> alerts, {
     required bool isOffline,
+    QuickAlert? newSos,
   }) {
     return view == AlertsView.home
         ? state.copyWith(
             pending: alerts,
             homeStatus: LoadStatus.success,
             isOffline: isOffline,
+            newSos: newSos,
           )
         : state.copyWith(
             all: alerts,
             inboxStatus: LoadStatus.success,
             isOffline: isOffline,
+            newSos: newSos,
           );
   }
 

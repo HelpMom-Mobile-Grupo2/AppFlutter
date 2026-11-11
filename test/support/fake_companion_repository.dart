@@ -48,6 +48,7 @@ class FakeCompanionRepository implements CompanionRepository {
   Object? unmarkDoneError;
   final markCalls = <String>[];
   final unmarkCalls = <String>[];
+  int summaryCalls = 0;
 
   // El fake no usa la API ni sqflite.
   @override
@@ -58,6 +59,7 @@ class FakeCompanionRepository implements CompanionRepository {
 
   @override
   Future<CompanionSummary> getSummary() async {
+    summaryCalls++;
     if (error != null) throw error!;
     return summary;
   }

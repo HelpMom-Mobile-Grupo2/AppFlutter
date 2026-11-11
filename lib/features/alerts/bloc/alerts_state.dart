@@ -12,6 +12,7 @@ final class AlertsState extends Equatable {
     this.notLinked = false,
     this.errorMessage,
     this.actionError,
+    this.newSos,
   });
 
   /// Respuesta de ?status=pending (Inicio), de la más reciente a la más antigua.
@@ -35,10 +36,14 @@ final class AlertsState extends Equatable {
   /// Error al responder una alerta: se muestra una sola vez (SnackBar).
   final String? actionError;
 
+  /// SOS pendiente que acaba de llegar: abre el aviso de pantalla completa.
+  /// Viene una sola vez por alerta.
+  final QuickAlert? newSos;
+
   /// La pendiente más reciente: la tarjeta de alerta activa de Inicio.
   QuickAlert? get activeAlert => pending.isEmpty ? null : pending.first;
 
-  /// [actionError] no se conserva: cada estado nuevo lo limpia.
+  /// [actionError] y [newSos] no se conservan: cada estado nuevo los limpia.
   AlertsState copyWith({
     List<QuickAlert>? pending,
     List<QuickAlert>? all,
@@ -48,6 +53,7 @@ final class AlertsState extends Equatable {
     bool? notLinked,
     String? errorMessage,
     String? actionError,
+    QuickAlert? newSos,
   }) {
     return AlertsState(
       pending: pending ?? this.pending,
@@ -58,6 +64,7 @@ final class AlertsState extends Equatable {
       notLinked: notLinked ?? this.notLinked,
       errorMessage: errorMessage ?? this.errorMessage,
       actionError: actionError,
+      newSos: newSos,
     );
   }
 
@@ -71,5 +78,6 @@ final class AlertsState extends Equatable {
     notLinked,
     errorMessage,
     actionError,
+    newSos,
   ];
 }

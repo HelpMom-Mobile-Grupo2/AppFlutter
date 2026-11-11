@@ -13,7 +13,8 @@ IconData alertTypeIcon(AlertType type) => switch (type) {
 
 /// Tarjeta de la alerta activa en Inicio.
 /// - Pendiente: terracota claro con los 3 botones de respuesta.
-/// - SOS pendiente: roja, con "Llamar a {madre}" y "Llamar al 106".
+/// - SOS pendiente: roja, con el motivo en grande, "Voy en camino",
+///   "Llamar a {madre}" y "Llamar al 106 (SAMU)".
 /// - Respondida: verde, "✓ Solicitud confirmada · Respondido".
 class AlertCard extends StatelessWidget {
   const AlertCard({
@@ -58,6 +59,7 @@ class AlertCard extends StatelessWidget {
     final title = alert.isSos
         ? '🆘 SOS de $motherName'
         : "🔔 $motherName pulsó 'Pasa la Voz'";
+    final sosReason = alert.sosReason;
 
     return Semantics(
       container: true,
@@ -78,6 +80,16 @@ class AlertCard extends StatelessWidget {
                   ),
                 ),
               ),
+              if (sosReason != null) ...[
+                const SizedBox(height: 8),
+                Text(
+                  'Motivo: $sosReason',
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    color: foreground,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
               const SizedBox(height: 4),
               Row(
                 children: [
@@ -93,7 +105,8 @@ class AlertCard extends StatelessWidget {
                   ),
                 ],
               ),
-              if (alert.message.isNotEmpty) ...[
+              // En la SOS automática el motivo ya resume el mensaje.
+              if (alert.message.isNotEmpty && sosReason == null) ...[
                 const SizedBox(height: 12),
                 Text(
                   '"${alert.message}"',
@@ -107,8 +120,19 @@ class AlertCard extends StatelessWidget {
                 const SizedBox(height: 12),
                 _RespondedLine(alert: alert),
               ],
-              if (alert.isSos) ...[
+              if (redCard) ...[
                 const SizedBox(height: 16),
+                FilledButton(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: scheme.surface,
+                    foregroundColor: StatusColors.red,
+                  ),
+                  onPressed: () => onRespond(AlertResponse.onMyWay),
+                  child: Text(AlertResponse.onMyWay.label),
+                ),
+              ],
+              if (alert.isSos) ...[
+                SizedBox(height: redCard ? 8 : 16),
                 _CallButtons(
                   motherName: motherName,
                   onRedCard: redCard,
@@ -116,9 +140,9 @@ class AlertCard extends StatelessWidget {
                   onCallEmergency: onCallEmergency,
                 ),
               ],
-              if (!responded) ...[
+              if (!responded && !alert.isSos) ...[
                 const SizedBox(height: 16),
-                _ResponseButtons(onRedCard: redCard, onRespond: onRespond),
+                _ResponseButtons(onRespond: onRespond),
               ],
             ],
           ),
@@ -163,24 +187,17 @@ class _RespondedLine extends StatelessWidget {
 }
 
 class _ResponseButtons extends StatelessWidget {
-  const _ResponseButtons({required this.onRedCard, required this.onRespond});
+  const _ResponseButtons({required this.onRespond});
 
-  final bool onRedCard;
   final ValueChanged<AlertResponse> onRespond;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    // Sobre rojo, botones claros con texto rojo; si no, terracota.
-    final style = onRedCard
-        ? FilledButton.styleFrom(
-            backgroundColor: scheme.surface,
-            foregroundColor: StatusColors.red,
-          )
-        : FilledButton.styleFrom(
-            backgroundColor: scheme.secondary,
-            foregroundColor: scheme.onSecondary,
-          );
+    final style = FilledButton.styleFrom(
+      backgroundColor: scheme.secondary,
+      foregroundColor: scheme.onSecondary,
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -238,7 +255,7 @@ class _CallButtons extends StatelessWidget {
               : null,
           onPressed: onCallEmergency,
           icon: const Icon(Icons.local_hospital_outlined),
-          label: const Text('Llamar al 106'),
+          label: const Text('Llamar al 106 (SAMU)'),
         ),
       ],
     );

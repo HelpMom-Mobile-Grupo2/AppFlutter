@@ -88,6 +88,19 @@ class QuickAlert extends Equatable {
   bool get isPending => status == AlertStatus.pending;
   bool get isSos => type == AlertType.sos;
 
+  /// Motivo de una SOS automática del backend, por ejemplo "sangrado
+  /// abundante". null si no es SOS o si la madre la envió a mano.
+  String? get sosReason {
+    if (!isSos || !message.startsWith('Alerta automática')) return null;
+    const marker = 'emergencia: ';
+    final index = message.indexOf(marker);
+    if (index >= 0) return message.substring(index + marker.length).trim();
+    if (message.contains('medición de salud')) {
+      return 'Medición de salud en rojo';
+    }
+    return null;
+  }
+
   /// Copia ya respondida: se usa para la respuesta optimista en la UI.
   QuickAlert respondedWith(AlertResponse response, DateTime at) {
     return QuickAlert(

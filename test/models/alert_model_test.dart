@@ -65,4 +65,50 @@ void main() {
     expect(AlertResponse.fromValue(2).label, 'Te llamo ahora');
     expect(AlertResponse.fromValue(3).label, 'Ya me encargué');
   });
+
+  group('sosReason', () {
+    QuickAlert alertWith(AlertType type, String message) => QuickAlert(
+      id: 'a1',
+      type: type,
+      message: message,
+      createdAt: DateTime.utc(2026, 11, 6, 12),
+      status: AlertStatus.pending,
+    );
+
+    test('SOS del asistente: devuelve la señal detectada', () {
+      final alert = alertWith(
+        AlertType.sos,
+        'Alerta automática: el asistente detectó una posible emergencia: '
+        'sangrado abundante',
+      );
+
+      expect(alert.sosReason, 'sangrado abundante');
+    });
+
+    test('SOS por la medición en rojo', () {
+      final alert = alertWith(
+        AlertType.sos,
+        'Alerta automática: la medición de salud salió en rojo',
+      );
+
+      expect(alert.sosReason, 'Medición de salud en rojo');
+    });
+
+    test('null si la madre envió la SOS a mano o si no es SOS', () {
+      expect(
+        alertWith(
+          AlertType.sos,
+          'Necesito ayuda urgente. Comunícate conmigo ahora.',
+        ).sosReason,
+        isNull,
+      );
+      expect(
+        alertWith(
+          AlertType.tiredOrPain,
+          'Alerta automática: la medición de salud salió en rojo',
+        ).sosReason,
+        isNull,
+      );
+    });
+  });
 }

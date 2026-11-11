@@ -6,6 +6,8 @@ import 'package:helpmom_companion/core/app_routes.dart';
 import 'package:helpmom_companion/core/app_theme.dart';
 import 'package:helpmom_companion/core/session_store.dart';
 import 'package:helpmom_companion/features/alerts/bloc/alerts_bloc.dart';
+import 'package:helpmom_companion/features/alerts/data/alert_model.dart';
+import 'package:helpmom_companion/features/alerts/ui/sos_dialog.dart';
 import 'package:helpmom_companion/features/auth/bloc/auth_bloc.dart';
 import 'package:helpmom_companion/features/companion/cubit/summary_cubit.dart';
 import 'package:helpmom_companion/features/companion/cubit/tips_cubit.dart';
@@ -42,7 +44,7 @@ void main() {
     companionRepository = FakeCompanionRepository();
   });
 
-  Widget buildApp() {
+  Widget buildApp({Duration refreshInterval = const Duration(seconds: 15)}) {
     final familyRepository = FakeFamilyRepository();
     return MultiRepositoryProvider(
       providers: [
@@ -68,7 +70,7 @@ void main() {
         ],
         child: MaterialApp(
           theme: AppTheme.light(useGoogleFonts: false),
-          home: const CompanionShell(),
+          home: CompanionShell(refreshInterval: refreshInterval),
           routes: {AppRoutes.link: (_) => const Text('Pantalla Vincular')},
         ),
       ),
@@ -189,5 +191,97 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Pantalla Vincular'), findsOneWidget);
+  });
+
+  group('SOS nueva', () {
+    final sos = buildAlert(
+      id: 'sos1',
+      type: AlertType.sos,
+      message:
+          'Alerta automática: el asistente detectó una posible emergencia: '
+          'sangrado abundante',
+      minutesAgo: 1,
+    );
+
+    testWidgets('abre el aviso rojo y "Ya lo vi" lo cierra', (tester) async {
+      setScreenSize(tester, const Size(400, 900));
+      alertsRepository.alerts = [sos];
+      await tester.pumpWidget(buildApp());
+      await tester.pumpAndSettle();
+
+      expect(find.byType(SosDialog), findsOneWidget);
+      expect(find.text('Daniela Gómez necesita ayuda'), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byType(SosDialog),
+          matching: find.text('Motivo: sangrado abundante'),
+        ),
+        findsOneWidget,
+      );
+
+      // No se cierra tocando afuera ni con "atrás".
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(find.byType(SosDialog), findsOneWidget);
+
+      await tester.tap(find.text('Ya lo vi'));
+      await tester.pumpAndSettle();
+      expect(find.byType(SosDialog), findsNothing);
+      expect(alertsRepository.respondCalls, isEmpty);
+    });
+
+    testWidgets('"Voy en camino" responde y cierra el aviso', (tester) async {
+      setScreenSize(tester, const Size(400, 900));
+      alertsRepository.alerts = [sos];
+      await tester.pumpWidget(buildApp());
+      await tester.pumpAndSettle();
+
+      await tester.tap(
+        find.descendant(
+          of: find.byType(SosDialog),
+          matching: find.text('Voy en camino'),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(SosDialog), findsNothing);
+      expect(alertsRepository.respondCalls, [('sos1', AlertResponse.onMyWay)]);
+    });
+
+    testWidgets('el timer trae la SOS sin deslizar, desde cualquier pestaña', (
+      tester,
+    ) async {
+      setScreenSize(tester, const Size(400, 900));
+      alertsRepository.alerts = [];
+      await tester.pumpWidget(
+        buildApp(refreshInterval: const Duration(seconds: 5)),
+      );
+      await tester.pumpAndSettle();
+
+      // En Perfil no corre el polling del bloc: solo el timer del contenedor.
+      await tester.tap(
+        find.descendant(
+          of: find.byType(NavigationBar),
+          matching: find.text('Perfil'),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byType(SosDialog), findsNothing);
+      final summaryCalls = companionRepository.summaryCalls;
+
+      alertsRepository.alerts = [sos];
+      await tester.pump(const Duration(seconds: 5));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(SosDialog), findsOneWidget);
+      expect(companionRepository.summaryCalls, greaterThan(summaryCalls));
+
+      // Sigue pendiente, pero el aviso no se repite.
+      await tester.tap(find.text('Ya lo vi'));
+      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 5));
+      await tester.pumpAndSettle();
+      expect(find.byType(SosDialog), findsNothing);
+    });
   });
 }

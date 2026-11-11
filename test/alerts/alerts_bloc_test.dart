@@ -174,6 +174,56 @@ void main() {
     expect(repository.fetchPendingCalls, 2);
   });
 
+  group('SOS nueva', () {
+    final sos = buildAlert(
+      id: 'sos1',
+      type: AlertType.sos,
+      message:
+          'Alerta automática: el asistente detectó una posible emergencia: '
+          'sangrado abundante',
+      minutesAgo: 1,
+    );
+
+    test('la marca una sola vez aunque siga pendiente', () async {
+      repository.alerts = [sos, pending];
+      final marked = <QuickAlert>[];
+      final subscription = bloc.stream.listen((state) {
+        if (state.newSos != null) marked.add(state.newSos!);
+      });
+
+      await loadHome();
+      await bloc.refresh(AlertsView.home);
+      await bloc.refresh(AlertsView.inbox);
+      await subscription.cancel();
+
+      expect(marked, [sos]);
+      // newSos no se conserva en los estados siguientes.
+      expect(bloc.state.newSos, isNull);
+    });
+
+    test('una SOS que llega después también se marca', () async {
+      await loadHome();
+      expect(bloc.state.newSos, isNull);
+
+      repository.alerts = [sos, pending];
+      final marked = bloc.stream.firstWhere((state) => state.newSos != null);
+      bloc.add(const AlertsRefreshRequested(AlertsView.home));
+
+      expect((await marked).newSos, sos);
+    });
+
+    test('una SOS ya respondida no se marca', () async {
+      repository.alerts = [sos.respondedWith(AlertResponse.onMyWay, baseTime)];
+      final states = <AlertsState>[];
+      final subscription = bloc.stream.listen(states.add);
+
+      await bloc.refresh(AlertsView.inbox);
+      await subscription.cancel();
+
+      expect(states.where((state) => state.newSos != null), isEmpty);
+    });
+  });
+
   group('polling', () {
     late AlertsBloc pollingBloc;
 

@@ -45,7 +45,7 @@ void main() {
     expect(find.text('Voy en camino'), findsOneWidget);
     expect(find.text('Te llamo ahora'), findsOneWidget);
     expect(find.text('Ya me encargué'), findsOneWidget);
-    expect(find.text('Llamar al 106'), findsNothing);
+    expect(find.text('Llamar al 106 (SAMU)'), findsNothing);
 
     await tester.tap(find.text('Voy en camino'));
     expect(answered, AlertResponse.onMyWay);
@@ -62,7 +62,9 @@ void main() {
     expect(card.color, StatusColors.greenContainer);
   });
 
-  testWidgets('SOS: tarjeta roja con llamadas y respuestas', (tester) async {
+  testWidgets('SOS: tarjeta roja con el motivo y tres acciones', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(800, 1400);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
@@ -79,17 +81,40 @@ void main() {
 
     expect(find.text('🆘 SOS de Daniela'), findsOneWidget);
     expect(tester.widget<Card>(find.byType(Card)).color, StatusColors.red);
-    expect(find.text('Llamar a Daniela'), findsOneWidget);
-    expect(find.text('Llamar al 106'), findsOneWidget);
+    expect(find.text('Motivo: Medición de salud en rojo'), findsOneWidget);
+    // El motivo reemplaza al mensaje entre comillas.
+    expect(find.textContaining('"Alerta automática'), findsNothing);
     expect(find.text('Voy en camino'), findsOneWidget);
+    expect(find.text('Llamar a Daniela'), findsOneWidget);
+    expect(find.text('Llamar al 106 (SAMU)'), findsOneWidget);
+    expect(find.text('Te llamo ahora'), findsNothing);
+    expect(find.text('Ya me encargué'), findsNothing);
 
     await tester.tap(find.text('Llamar a Daniela'));
-    await tester.tap(find.text('Llamar al 106'));
-    await tester.tap(find.text('Te llamo ahora'));
+    await tester.tap(find.text('Llamar al 106 (SAMU)'));
+    await tester.tap(find.text('Voy en camino'));
 
     expect(calledMother, 1);
     expect(calledEmergency, 1);
-    expect(answered, AlertResponse.callingNow);
+    expect(answered, AlertResponse.onMyWay);
+  });
+
+  testWidgets('SOS enviada a mano: sin motivo, con su mensaje', (tester) async {
+    tester.view.physicalSize = const Size(800, 1400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(
+      buildCard(
+        buildAlert(
+          type: AlertType.sos,
+          message: 'Necesito ayuda urgente. Comunícate conmigo ahora.',
+        ),
+      ),
+    );
+
+    expect(find.textContaining('Motivo:'), findsNothing);
+    expect(find.textContaining('"Necesito ayuda urgente'), findsOneWidget);
   });
 
   testWidgets('SOS respondida sigue mostrando las llamadas', (tester) async {
@@ -109,7 +134,7 @@ void main() {
 
     expect(find.text('✓ Solicitud confirmada · Respondido'), findsOneWidget);
     expect(find.text('Llamar a Daniela'), findsOneWidget);
-    expect(find.text('Llamar al 106'), findsOneWidget);
+    expect(find.text('Llamar al 106 (SAMU)'), findsOneWidget);
     expect(find.widgetWithText(FilledButton, 'Voy en camino'), findsNothing);
   });
 }
