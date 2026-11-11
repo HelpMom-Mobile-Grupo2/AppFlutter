@@ -46,3 +46,7 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Firmas de Android en cualquier carpeta (android/.gitignore solo cubre android/)
+*.jks
+*.keystore
