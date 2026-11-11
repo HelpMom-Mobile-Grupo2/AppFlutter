@@ -22,6 +22,8 @@ flutter test
 
 ```bash
 flutter run
+# o, para elegir el emulador Android:
+flutter run -d emulator-5554
 ```
 
 La URL por defecto es `https://helpmom-backend.onrender.com/`. Render usa el plan gratis y "se duerme": la primera llamada puede tardar hasta unos 50 s. Mientras tanto, la app muestra **"Conectando con el servidor…"**. El timeout es de 60 s.
