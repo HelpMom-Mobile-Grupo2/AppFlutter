@@ -157,6 +157,40 @@ void main() {
     expect(find.text('Evita que cargue peso o paquetes'), findsOneWidget);
   });
 
+  group('orden de Inicio', () {
+    double topOf(WidgetTester tester, String text) =>
+        tester.getTopLeft(find.text(text)).dy;
+
+    testWidgets('con alerta pendiente, la alerta va primero', (tester) async {
+      setScreenSize(tester, const Size(400, 2000));
+      await tester.pumpWidget(buildApp());
+      await tester.pumpAndSettle();
+
+      expect(
+        topOf(tester, "🔔 Daniela Gómez pulsó 'Pasa la Voz'"),
+        lessThan(topOf(tester, 'Estado de Daniela Gómez hoy')),
+      );
+    });
+
+    testWidgets('sin alerta pendiente, el semáforo va primero', (tester) async {
+      setScreenSize(tester, const Size(400, 2000));
+      alertsRepository.alerts = [];
+      await tester.pumpWidget(buildApp());
+      await tester.pumpAndSettle();
+
+      expect(
+        topOf(tester, 'Estado de Daniela Gómez hoy'),
+        lessThan(
+          topOf(
+            tester,
+            'Aún no hay alertas, te avisaremos cuando Daniela Gómez te '
+            'necesite',
+          ),
+        ),
+      );
+    });
+  });
+
   testWidgets('estado vacío si no hay embarazo ni mediciones (D.2)', (
     tester,
   ) async {

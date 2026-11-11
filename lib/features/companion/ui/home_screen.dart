@@ -57,14 +57,23 @@ class HomeScreen extends StatelessWidget {
                 ),
                 SliverPadding(
                   padding: const EdgeInsets.all(16),
-                  sliver: SliverList.list(
-                    children: [
-                      _ActiveAlertSection(motherName: motherName),
-                      const SizedBox(height: 16),
-                      _StatusSection(state: summaryState),
-                      const SizedBox(height: 16),
-                      const _MissionSection(),
-                    ],
+                  // Con una alerta pendiente, la alerta va primero; si no,
+                  // el semáforo queda arriba para que se vea más.
+                  sliver: BlocSelector<AlertsBloc, AlertsState, bool>(
+                    selector: (state) => state.activeAlert?.isPending ?? false,
+                    builder: (context, hasPending) {
+                      final alert = _ActiveAlertSection(motherName: motherName);
+                      final status = _StatusSection(state: summaryState);
+                      return SliverList.list(
+                        children: [
+                          hasPending ? alert : status,
+                          const SizedBox(height: 16),
+                          hasPending ? status : alert,
+                          const SizedBox(height: 16),
+                          const _MissionSection(),
+                        ],
+                      );
+                    },
                   ),
                 ),
               ],
