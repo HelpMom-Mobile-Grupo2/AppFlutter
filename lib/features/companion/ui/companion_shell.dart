@@ -17,18 +17,17 @@ import 'guide_screen.dart';
 import 'home_screen.dart';
 
 class _Destination {
-  const _Destination(this.label, this.icon, this.selectedIcon);
+  const _Destination(this.label, this.icon);
 
   final String label;
   final IconData icon;
-  final IconData selectedIcon;
 }
 
 const _destinations = [
-  _Destination('Inicio', Icons.home_outlined, Icons.home),
-  _Destination('Alertas', Icons.notifications_outlined, Icons.notifications),
-  _Destination('Guía', Icons.menu_book_outlined, Icons.menu_book),
-  _Destination('Perfil', Icons.person_outline, Icons.person),
+  _Destination('Inicio', Icons.home_rounded),
+  _Destination('Alertas', Icons.notifications_rounded),
+  _Destination('Guía', Icons.menu_book_rounded),
+  _Destination('Perfil', Icons.person_rounded),
 ];
 
 const _pages = [HomeScreen(), AlertsScreen(), GuideScreen(), ProfileScreen()];
@@ -217,11 +216,7 @@ class _CompanionShellState extends State<CompanionShell> {
                 onDestinationSelected: _onDestinationSelected,
                 destinations: [
                   for (final d in _destinations)
-                    NavigationDestination(
-                      icon: Icon(d.icon),
-                      selectedIcon: Icon(d.selectedIcon),
-                      label: d.label,
-                    ),
+                    NavigationDestination(icon: Icon(d.icon), label: d.label),
                 ],
               ),
             );
@@ -240,7 +235,6 @@ class _CompanionShellState extends State<CompanionShell> {
                       for (final d in _destinations)
                         NavigationRailDestination(
                           icon: Icon(d.icon),
-                          selectedIcon: Icon(d.selectedIcon),
                           label: Text(d.label),
                         ),
                     ],

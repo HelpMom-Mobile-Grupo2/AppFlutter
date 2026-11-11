@@ -11,11 +11,11 @@ IconData alertTypeIcon(AlertType type) => switch (type) {
   AlertType.sos => Icons.sos,
 };
 
-/// Tarjeta de la alerta activa en Inicio.
-/// - Pendiente: terracota claro con los 3 botones de respuesta.
+/// Tarjeta de la alerta activa en Inicio (frames 4 y 5 del Figma).
+/// - Pendiente: crema con borde ámbar, "Voy en camino" y "Llamando ahora".
 /// - SOS pendiente: roja, con el motivo en grande, "Voy en camino",
 ///   "Llamar a {madre}" y "Llamar al 106 (SAMU)".
-/// - Respondida: verde, "✓ Solicitud confirmada · Respondido".
+/// - Respondida: borde verde, "✓ Solicitud confirmada" y "Respondido ✓".
 class AlertCard extends StatelessWidget {
   const AlertCard({
     super.key,
@@ -33,7 +33,7 @@ class AlertCard extends StatelessWidget {
   final VoidCallback onCallMother;
   final VoidCallback onCallEmergency;
 
-  /// Hora de referencia para "hace N min" (los tests la fijan).
+  /// Hora de referencia para "Hace N min" (los tests la fijan).
   final DateTime? now;
 
   @override
@@ -42,86 +42,109 @@ class AlertCard extends StatelessWidget {
     final scheme = theme.colorScheme;
     final responded = !alert.isPending;
     final redCard = alert.isSos && !responded;
+    final sosReason = alert.sosReason;
 
     final Color background;
-    final Color foreground;
-    if (responded) {
-      background = StatusColors.greenContainer;
-      foreground = scheme.onSurface;
-    } else if (redCard) {
+    final Color border;
+    final Color titleColor;
+    final Color textColor;
+    final String title;
+    if (redCard) {
       background = StatusColors.red;
-      foreground = scheme.onError;
+      border = StatusColors.red;
+      titleColor = scheme.onError;
+      textColor = scheme.onError;
+      title = '🆘 SOS de $motherName';
+    } else if (responded) {
+      background = scheme.surface;
+      border = StatusColors.green;
+      titleColor = StatusColors.green;
+      textColor = scheme.onSurfaceVariant;
+      title = '✓ Solicitud confirmada';
     } else {
-      background = scheme.secondaryContainer;
-      foreground = scheme.onSecondaryContainer;
+      background = AppColors.alertContainer;
+      border = AppColors.alertBorder;
+      titleColor = AppColors.alertTitle;
+      textColor = AppColors.alertTitle;
+      title = "⚠ $motherName pulsó 'Pasa la Voz'";
     }
 
-    final title = alert.isSos
-        ? '🆘 SOS de $motherName'
-        : "🔔 $motherName pulsó 'Pasa la Voz'";
-    final sosReason = alert.sosReason;
+    final time = timeAgo(
+      responded ? alert.respondedAt ?? alert.createdAt : alert.createdAt,
+      now: now,
+    );
 
     return Semantics(
       container: true,
       child: Card(
         color: background,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: border, width: 1.5),
+        ),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Semantics(
-                header: true,
-                child: Text(
-                  title,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: foreground,
-                    fontWeight: FontWeight.w700,
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Semantics(
+                      header: true,
+                      child: Text(
+                        title,
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          color: titleColor,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(width: 8),
+                  Text(
+                    _capitalize(time),
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: textColor,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
               ),
               if (sosReason != null) ...[
                 const SizedBox(height: 8),
                 Text(
                   'Motivo: $sosReason',
                   style: theme.textTheme.headlineSmall?.copyWith(
-                    color: foreground,
+                    color: redCard ? scheme.onError : scheme.onSurface,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
               ],
-              const SizedBox(height: 4),
-              Row(
-                children: [
-                  Icon(alertTypeIcon(alert.type), size: 18, color: foreground),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      '${alert.type.label} · ${timeAgo(alert.createdAt, now: now)}',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: foreground,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
               // En la SOS automática el motivo ya resume el mensaje.
               if (alert.message.isNotEmpty && sosReason == null) ...[
                 const SizedBox(height: 12),
+                _MessageBox(message: alert.message),
+              ],
+              if (responded && alert.response != null) ...[
+                const SizedBox(height: 8),
                 Text(
-                  '"${alert.message}"',
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    color: foreground,
-                    fontStyle: FontStyle.italic,
-                  ),
+                  'Respondiste: ${alert.response!.label}',
+                  style: theme.textTheme.bodySmall?.copyWith(color: textColor),
                 ),
               ],
-              if (responded) ...[
-                const SizedBox(height: 12),
-                _RespondedLine(alert: alert),
-              ],
-              if (redCard) ...[
-                const SizedBox(height: 16),
+              const SizedBox(height: 16),
+              if (responded)
+                FilledButton(
+                  style: FilledButton.styleFrom(
+                    disabledBackgroundColor: StatusColors.green,
+                    disabledForegroundColor: scheme.onPrimary,
+                  ),
+                  onPressed: null,
+                  child: const Text('Respondido ✓'),
+                )
+              else if (redCard)
                 FilledButton(
                   style: FilledButton.styleFrom(
                     backgroundColor: scheme.surface,
@@ -129,10 +152,11 @@ class AlertCard extends StatelessWidget {
                   ),
                   onPressed: () => onRespond(AlertResponse.onMyWay),
                   child: Text(AlertResponse.onMyWay.label),
-                ),
-              ],
+                )
+              else
+                _ResponseButtons(onRespond: onRespond),
               if (alert.isSos) ...[
-                SizedBox(height: redCard ? 8 : 16),
+                const SizedBox(height: 8),
                 _CallButtons(
                   motherName: motherName,
                   onRedCard: redCard,
@@ -140,52 +164,41 @@ class AlertCard extends StatelessWidget {
                   onCallEmergency: onCallEmergency,
                 ),
               ],
-              if (!responded && !alert.isSos) ...[
-                const SizedBox(height: 16),
-                _ResponseButtons(onRespond: onRespond),
-              ],
             ],
           ),
         ),
       ),
     );
   }
+
+  static String _capitalize(String text) =>
+      text.isEmpty ? text : text[0].toUpperCase() + text.substring(1);
 }
 
-class _RespondedLine extends StatelessWidget {
-  const _RespondedLine({required this.alert});
+/// El mensaje de la madre en una caja blanca con borde gris claro.
+class _MessageBox extends StatelessWidget {
+  const _MessageBox({required this.message});
 
-  final QuickAlert alert;
+  final String message;
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Icon(Icons.check_circle, color: StatusColors.green),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '✓ Solicitud confirmada · Respondido',
-                style: textTheme.titleSmall,
-              ),
-              if (alert.response != null)
-                Text(
-                  'Respondiste: ${alert.response!.label}',
-                  style: textTheme.bodyMedium,
-                ),
-            ],
-          ),
-        ),
-      ],
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.cardBorder),
+      ),
+      child: Text('"$message"', style: theme.textTheme.bodyMedium),
     );
   }
 }
 
+/// "Voy en camino" (relleno terracota) y "Llamando ahora" (borde
+/// terracota) en fila. "Ya me encargué" queda debajo como botón de texto
+/// para no perder esa respuesta.
 class _ResponseButtons extends StatelessWidget {
   const _ResponseButtons({required this.onRespond});
 
@@ -194,22 +207,40 @@ class _ResponseButtons extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final style = FilledButton.styleFrom(
-      backgroundColor: scheme.secondary,
-      foregroundColor: scheme.onSecondary,
-    );
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        for (final response in AlertResponse.values) ...[
-          FilledButton(
-            style: style,
-            onPressed: () => onRespond(response),
-            child: Text(response.label),
-          ),
-          if (response != AlertResponse.values.last) const SizedBox(height: 8),
-        ],
+        Row(
+          children: [
+            Expanded(
+              child: FilledButton(
+                style: FilledButton.styleFrom(
+                  backgroundColor: scheme.secondary,
+                  foregroundColor: scheme.onSecondary,
+                ),
+                onPressed: () => onRespond(AlertResponse.onMyWay),
+                child: Text(AlertResponse.onMyWay.label),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  backgroundColor: scheme.surface,
+                  foregroundColor: AppColors.accentText,
+                  side: BorderSide(color: scheme.secondary),
+                ),
+                onPressed: () => onRespond(AlertResponse.callingNow),
+                child: const Text('Llamando ahora'),
+              ),
+            ),
+          ],
+        ),
+        TextButton(
+          style: TextButton.styleFrom(foregroundColor: AppColors.accentText),
+          onPressed: () => onRespond(AlertResponse.done),
+          child: Text(AlertResponse.done.label),
+        ),
       ],
     );
   }

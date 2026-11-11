@@ -59,8 +59,12 @@ class _LinkScreenState extends State<LinkScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // Fondo claro como en el Figma, para que la tarjeta gris de los pasos
+      // se distinga.
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         title: const Text('Vincular con tu pareja'),
+        centerTitle: true,
         automaticallyImplyLeading: false,
         actions: [
           TextButton(
@@ -88,56 +92,61 @@ class _LinkScreenState extends State<LinkScreen> {
 
   Widget _buildForm(BuildContext context, LinkState state) {
     final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     final loading = state is LinkLoading;
+    // Clave en monoespaciada y grande, como en el Figma.
+    final codeStyle = theme.textTheme.headlineSmall?.copyWith(
+      fontFamily: 'monospace',
+      fontFamilyFallback: const ['Courier New', 'Courier'],
+      fontWeight: FontWeight.w700,
+      letterSpacing: 4,
+    );
 
     return Form(
       key: _formKey,
       child: ListView(
         padding: const EdgeInsets.all(24),
         children: [
-          Icon(Icons.qr_code_2, size: 72, color: theme.colorScheme.secondary),
-          const SizedBox(height: 16),
-          Text(
-            'Pídele a tu pareja que abra HelpMom y genere su código de '
-            'invitación. Escanea el QR o escribe la clave que aparece debajo.',
-            textAlign: TextAlign.center,
-            style: theme.textTheme.bodyLarge,
-          ),
-          const SizedBox(height: 24),
-          FilledButton.icon(
-            onPressed: loading ? null : _scan,
-            icon: const Icon(Icons.qr_code_scanner),
-            label: const Text('Escanear código QR'),
-          ),
-          const SizedBox(height: 24),
-          Row(
-            children: [
-              const Expanded(child: Divider()),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Text('o', style: theme.textTheme.bodyMedium),
+          Semantics(
+            header: true,
+            child: Text(
+              'Conecta con tu pareja',
+              textAlign: TextAlign.center,
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.w700,
               ),
-              const Expanded(child: Divider()),
-            ],
+            ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 8),
+          Text(
+            'Recibirás sus alertas de apoyo y verás su semáforo, sin ver sus '
+            'datos clínicos.',
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: scheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 32),
           TextFormField(
             controller: _code,
             textCapitalization: TextCapitalization.characters,
             autocorrect: false,
+            textAlign: TextAlign.center,
             textInputAction: TextInputAction.done,
             onFieldSubmitted: (_) => _submit(),
+            style: codeStyle,
             decoration: InputDecoration(
-              labelText: 'Ingresar clave',
-              hintText: 'HM-1234',
-              prefixIcon: const Icon(Icons.key_outlined),
+              labelText: 'Clave de acceso',
+              floatingLabelAlignment: FloatingLabelAlignment.center,
+              hintText: 'HM-XXXX',
+              hintStyle: codeStyle?.copyWith(color: scheme.outline),
               errorText: state is LinkFailure ? state.message : null,
               errorMaxLines: 3,
             ),
             validator: _validateCode,
           ),
           const SizedBox(height: 16),
-          OutlinedButton(
+          FilledButton(
             onPressed: loading ? null : _submit,
             child: loading
                 ? const SizedBox.square(
@@ -146,6 +155,77 @@ class _LinkScreenState extends State<LinkScreen> {
                   )
                 : const Text('Vincular'),
           ),
+          const SizedBox(height: 12),
+          OutlinedButton.icon(
+            style: OutlinedButton.styleFrom(
+              foregroundColor: scheme.primary,
+              side: BorderSide(color: scheme.primary),
+            ),
+            onPressed: loading ? null : _scan,
+            icon: const Icon(Icons.qr_code_scanner),
+            label: const Text('Escanear código QR'),
+          ),
+          const SizedBox(height: 32),
+          const _Steps(),
+        ],
+      ),
+    );
+  }
+}
+
+/// Pasos numerados en una tarjeta gris claro.
+class _Steps extends StatelessWidget {
+  const _Steps();
+
+  static const _steps = [
+    'Tu pareja abre HelpMom y genera su código de invitación.',
+    'Escanea su código QR o escribe la clave HM-XXXX.',
+    '¡Listo! Te avisaremos cuando te necesite.',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: scheme.surfaceContainer,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.cardBorder),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (final (i, step) in _steps.indexed)
+            Padding(
+              padding: EdgeInsets.only(top: i == 0 ? 0 : 12),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CircleAvatar(
+                    radius: 12,
+                    backgroundColor: scheme.primary,
+                    foregroundColor: scheme.onPrimary,
+                    child: Text(
+                      '${i + 1}',
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: scheme.onPrimary,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      step,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
         ],
       ),
     );

@@ -35,18 +35,37 @@ void main() {
     );
   }
 
+  /// Borde de la tarjeta (color y grosor).
+  BorderSide cardSide(WidgetTester tester) {
+    final card = tester.widget<Card>(find.byType(Card));
+    return (card.shape! as RoundedRectangleBorder).side;
+  }
+
   testWidgets('pendiente → respondida', (tester) async {
     final alert = buildAlert(minutesAgo: 5);
     await tester.pumpWidget(buildCard(alert));
 
-    expect(find.text("🔔 Daniela pulsó 'Pasa la Voz'"), findsOneWidget);
-    expect(find.text('Cansancio o dolor · hace 5 min'), findsOneWidget);
+    expect(find.text("⚠ Daniela pulsó 'Pasa la Voz'"), findsOneWidget);
+    expect(find.text('Hace 5 min'), findsOneWidget);
     expect(find.textContaining('"Siento mucho cansancio'), findsOneWidget);
-    expect(find.text('Voy en camino'), findsOneWidget);
-    expect(find.text('Te llamo ahora'), findsOneWidget);
+    expect(
+      tester.widget<Card>(find.byType(Card)).color,
+      AppColors.alertContainer,
+    );
+    expect(cardSide(tester).color, AppColors.alertBorder);
+    expect(cardSide(tester).width, 1.5);
+    expect(find.widgetWithText(FilledButton, 'Voy en camino'), findsOneWidget);
+    expect(
+      find.widgetWithText(OutlinedButton, 'Llamando ahora'),
+      findsOneWidget,
+    );
     expect(find.text('Ya me encargué'), findsOneWidget);
     expect(find.text('Llamar al 106 (SAMU)'), findsNothing);
 
+    await tester.tap(find.text('Llamando ahora'));
+    expect(answered, AlertResponse.callingNow);
+    await tester.tap(find.text('Ya me encargué'));
+    expect(answered, AlertResponse.done);
     await tester.tap(find.text('Voy en camino'));
     expect(answered, AlertResponse.onMyWay);
 
@@ -55,11 +74,14 @@ void main() {
       buildCard(alert.respondedWith(AlertResponse.onMyWay, baseTime)),
     );
 
-    expect(find.text('✓ Solicitud confirmada · Respondido'), findsOneWidget);
+    expect(find.text('✓ Solicitud confirmada'), findsOneWidget);
     expect(find.text('Respondiste: Voy en camino'), findsOneWidget);
     expect(find.widgetWithText(FilledButton, 'Voy en camino'), findsNothing);
-    final card = tester.widget<Card>(find.byType(Card));
-    expect(card.color, StatusColors.greenContainer);
+    expect(cardSide(tester).color, StatusColors.green);
+    final done = tester.widget<FilledButton>(
+      find.widgetWithText(FilledButton, 'Respondido ✓'),
+    );
+    expect(done.onPressed, isNull);
   });
 
   testWidgets('SOS: tarjeta roja con el motivo y tres acciones', (
@@ -132,7 +154,8 @@ void main() {
       ),
     );
 
-    expect(find.text('✓ Solicitud confirmada · Respondido'), findsOneWidget);
+    expect(find.text('✓ Solicitud confirmada'), findsOneWidget);
+    expect(find.text('Respondido ✓'), findsOneWidget);
     expect(find.text('Llamar a Daniela'), findsOneWidget);
     expect(find.text('Llamar al 106 (SAMU)'), findsOneWidget);
     expect(find.widgetWithText(FilledButton, 'Voy en camino'), findsNothing);

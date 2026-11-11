@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/app_theme.dart';
 import '../../../core/phone_launcher.dart';
 import '../../../core/session_store.dart';
 import '../../../core/widgets/empty_view.dart';
@@ -85,6 +86,8 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
+/// Header blanco del Figma: avatar con la inicial, chip "Modo Compañero",
+/// "Hola, {nombre}" y a la derecha "{madre} (Sem. X)".
 class _HomeAppBar extends StatelessWidget {
   const _HomeAppBar({required this.firstName, required this.summary});
 
@@ -94,6 +97,7 @@ class _HomeAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     // La altura crece con el tamaño de texto del sistema.
     final scaler = MediaQuery.textScalerOf(context);
     final weeks = summary?.gestationalWeeks;
@@ -102,32 +106,76 @@ class _HomeAppBar extends StatelessWidget {
         : weeks == null
         ? summary!.motherName
         : '${summary!.motherName} (Sem. $weeks)';
+    final initial = firstName.isEmpty ? '?' : firstName[0].toUpperCase();
 
     return SliverAppBar(
       pinned: true,
-      expandedHeight: kToolbarHeight + scaler.scale(44),
-      title: Text(
-        firstName.isEmpty
-            ? 'Modo Compañero'
-            : 'Modo Compañero · Hola, $firstName',
-        overflow: TextOverflow.ellipsis,
-        style: theme.textTheme.titleMedium?.copyWith(
-          fontWeight: FontWeight.w700,
-        ),
-      ),
-      flexibleSpace: FlexibleSpaceBar(
-        background: Align(
-          alignment: Alignment.bottomLeft,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            child: Text(
-              motherLine,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.titleLarge,
+      toolbarHeight: 24 + scaler.scale(48),
+      titleSpacing: 16,
+      title: Row(
+        children: [
+          ExcludeSemantics(
+            child: CircleAvatar(
+              radius: 20,
+              backgroundColor: scheme.secondary,
+              foregroundColor: scheme.onSecondary,
+              child: Text(
+                initial,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: scheme.onSecondary,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
             ),
           ),
-        ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: scheme.secondaryContainer,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Text(
+                    'Modo Compañero',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: AppColors.accentText,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  firstName.isEmpty ? 'Hola' : 'Hola, $firstName',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Text(
+              motherLine,
+              maxLines: 2,
+              textAlign: TextAlign.end,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: scheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

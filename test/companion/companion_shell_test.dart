@@ -90,6 +90,14 @@ void main() {
 
     expect(find.byType(NavigationBar), findsOneWidget);
     expect(find.byType(NavigationRail), findsNothing);
+    for (final icon in [
+      Icons.home_rounded,
+      Icons.notifications_rounded,
+      Icons.menu_book_rounded,
+      Icons.person_rounded,
+    ]) {
+      expect(find.byIcon(icon), findsOneWidget);
+    }
 
     await tester.tap(
       find.descendant(
@@ -147,11 +155,14 @@ void main() {
     await tester.pumpWidget(buildApp());
     await tester.pumpAndSettle();
 
-    expect(find.text('Modo Compañero · Hola, Carlos'), findsOneWidget);
+    expect(find.text('Modo Compañero'), findsOneWidget);
+    expect(find.text('Hola, Carlos'), findsOneWidget);
+    expect(find.text('C'), findsOneWidget); // Avatar con la inicial.
     expect(find.text('Daniela Gómez (Sem. 25)'), findsOneWidget);
-    expect(find.text("🔔 Daniela Gómez pulsó 'Pasa la Voz'"), findsOneWidget);
+    expect(find.text("⚠ Daniela Gómez pulsó 'Pasa la Voz'"), findsOneWidget);
     expect(find.text('Estado de Daniela Gómez hoy'), findsOneWidget);
     expect(find.text('Semáforo verde'), findsOneWidget);
+    expect(find.text('Estable'), findsOneWidget);
     expect(find.text('Semana 25 · Día 1'), findsOneWidget);
     expect(find.text('Misión de apoyo de hoy'), findsOneWidget);
     expect(find.text('Evita que cargue peso o paquetes'), findsOneWidget);
@@ -167,7 +178,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(
-        topOf(tester, "🔔 Daniela Gómez pulsó 'Pasa la Voz'"),
+        topOf(tester, "⚠ Daniela Gómez pulsó 'Pasa la Voz'"),
         lessThan(topOf(tester, 'Estado de Daniela Gómez hoy')),
       );
     });

@@ -154,17 +154,17 @@ void main() {
     await tester.tap(find.text('Responder'));
     await tester.pumpAndSettle();
 
-    expect(find.text("🔔 Daniela Gómez pulsó 'Pasa la Voz'"), findsOneWidget);
+    expect(find.text("⚠ Daniela Gómez pulsó 'Pasa la Voz'"), findsOneWidget);
 
     await tester.tap(find.text('Voy en camino'));
     await tester.pumpAndSettle();
 
     expect(repository.respondCalls, [('p1', AlertResponse.onMyWay)]);
-    expect(find.text('✓ Solicitud confirmada · Respondido'), findsOneWidget);
+    expect(find.text('✓ Solicitud confirmada'), findsOneWidget);
     expect(find.text('Respondida · Voy en camino'), findsOneWidget);
   });
 
-  testWidgets('"Te llamo ahora" con teléfono guardado registra la respuesta', (
+  testWidgets('"Llamando ahora" con teléfono guardado registra la respuesta', (
     tester,
   ) async {
     await session.setMotherPhone('987654321');
@@ -174,7 +174,7 @@ void main() {
     await tester.pumpAndSettle();
     // También intenta abrir el marcador (tel:987654321); en los tests no hay
     // plataforma, así que solo verificamos la respuesta.
-    await tester.tap(find.text('Te llamo ahora'));
+    await tester.tap(find.text('Llamando ahora'));
     await tester.pumpAndSettle();
 
     expect(repository.respondCalls, [('p1', AlertResponse.callingNow)]);

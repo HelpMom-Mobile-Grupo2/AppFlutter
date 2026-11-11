@@ -9,6 +9,7 @@ const _accentContainer = Color(0xFFFBE3DC);
 const _surface = Color(0xFFFBFBFC);
 const _surfaceContainer = Color(0xFFF0F4F8);
 const _onSurface = Color(0xFF1A1C1E);
+const _onSurfaceMuted = Color(0xFF5F6B7A);
 
 /// Colores del semáforo de salud. Las pantallas los usan desde aquí
 /// (StatusColors.green), nunca con valores hexadecimales sueltos.
@@ -21,6 +22,29 @@ class StatusColors {
   static const amberContainer = Color(0xFFFFF3E0);
   static const red = Color(0xFFC62828);
   static const redContainer = Color(0xFFFFEBEE);
+
+  /// Texto ámbar sobre amberContainer: #EF6C00 ahí no llega a 4.5:1.
+  static const amberText = Color(0xFF9A4A00);
+}
+
+/// Tokens del diseño de Figma que no entran en el ColorScheme.
+class AppColors {
+  AppColors._();
+
+  /// Tarjeta de alerta pendiente (frame 4).
+  static const alertContainer = Color(0xFFFFF8E7);
+  static const alertBorder = Color(0xFFF2C94C);
+
+  /// Título de la alerta pendiente: ámbar oscuro sobre crema (5.6:1).
+  static const alertTitle = Color(0xFF8A5A00);
+
+  /// Borde de 1 dp de las tarjetas y de las filas de la misión.
+  static const cardBorder = Color(0xFFE3E8EF);
+
+  /// Terracota oscuro para TEXTO sobre blanco o terracota claro. El
+  /// terracota #E07A5F se usa en rellenos, bordes e indicadores, pero como
+  /// texto no llega al contraste mínimo (2.9:1 sobre blanco).
+  static const accentText = Color(0xFFA8432A);
 }
 
 class AppTheme {
@@ -40,6 +64,7 @@ class AppTheme {
       onSecondaryContainer: _onSurface,
       surface: _surface,
       onSurface: _onSurface,
+      onSurfaceVariant: _onSurfaceMuted,
       surfaceContainer: _surfaceContainer,
       error: StatusColors.red,
     );
@@ -54,12 +79,21 @@ class AppTheme {
     );
     const minButtonSize = Size(48, 48);
 
+    // Etiqueta e ícono de la pestaña activa en terracota (texto oscuro).
+    Color navColor(Set<WidgetState> states) =>
+        states.contains(WidgetState.selected)
+        ? AppColors.accentText
+        : _onSurfaceMuted;
+
     return base.copyWith(
       textTheme: textTheme,
-      scaffoldBackgroundColor: _surface,
+      // Tarjetas blancas sobre el fondo gris azulado del Figma.
+      scaffoldBackgroundColor: _surfaceContainer,
       appBarTheme: AppBarTheme(
-        backgroundColor: _accent,
+        backgroundColor: Colors.white,
         foregroundColor: _onSurface,
+        surfaceTintColor: Colors.transparent,
+        scrolledUnderElevation: 0,
         titleTextStyle: textTheme.titleLarge?.copyWith(
           color: _onSurface,
           fontWeight: FontWeight.w700,
@@ -71,10 +105,13 @@ class AppTheme {
         indicatorColor: _onSurface,
       ),
       cardTheme: CardThemeData(
-        color: _surfaceContainer,
+        color: Colors.white,
         elevation: 0,
         margin: EdgeInsets.zero,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(color: AppColors.cardBorder),
+        ),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
@@ -93,16 +130,37 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: _surfaceContainer,
+        fillColor: Colors.white,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),
-      navigationBarTheme: const NavigationBarThemeData(
-        backgroundColor: _surfaceContainer,
-        indicatorColor: _accent,
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
+        indicatorColor: _accentContainer,
+        iconTheme: WidgetStateProperty.resolveWith(
+          (states) => IconThemeData(color: navColor(states)),
+        ),
+        labelTextStyle: WidgetStateProperty.resolveWith(
+          (states) => textTheme.labelMedium?.copyWith(
+            color: navColor(states),
+            fontWeight: states.contains(WidgetState.selected)
+                ? FontWeight.w700
+                : FontWeight.w500,
+          ),
+        ),
       ),
-      navigationRailTheme: const NavigationRailThemeData(
-        backgroundColor: _surfaceContainer,
-        indicatorColor: _accent,
+      navigationRailTheme: NavigationRailThemeData(
+        backgroundColor: Colors.white,
+        indicatorColor: _accentContainer,
+        selectedIconTheme: const IconThemeData(color: AppColors.accentText),
+        unselectedIconTheme: const IconThemeData(color: _onSurfaceMuted),
+        selectedLabelTextStyle: textTheme.labelMedium?.copyWith(
+          color: AppColors.accentText,
+          fontWeight: FontWeight.w700,
+        ),
+        unselectedLabelTextStyle: textTheme.labelMedium?.copyWith(
+          color: _onSurfaceMuted,
+        ),
       ),
       snackBarTheme: const SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
