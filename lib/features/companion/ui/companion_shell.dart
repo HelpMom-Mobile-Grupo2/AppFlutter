@@ -127,7 +127,7 @@ class _CompanionShellState extends State<CompanionShell> {
           listenWhen: (_, current) =>
               current is TipsLoaded && current.actionError != null,
           listener: (_, state) => _showMessage(
-            'No se pudo marcar el tip. ${(state as TipsLoaded).actionError}',
+            'No se pudo actualizar el tip. ${(state as TipsLoaded).actionError}',
           ),
         ),
       ],

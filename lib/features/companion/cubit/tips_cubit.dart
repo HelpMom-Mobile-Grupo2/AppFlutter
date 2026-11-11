@@ -35,27 +35,33 @@ class TipsCubit extends Cubit<TipsState> {
     }
   }
 
-  /// Se marca al instante y se revierte si el backend falla.
-  Future<void> markDone(String tipId) async {
+  /// Marca o desmarca el tip (por si se marcó por error). El cambio se ve al
+  /// instante y se revierte si el backend falla.
+  Future<void> toggle(String tipId) async {
     final current = state;
     if (current is! TipsLoaded) return;
     final tip = current.tips.where((t) => t.id == tipId).firstOrNull;
-    if (tip == null || tip.done) return;
+    if (tip == null) return;
 
-    emit(_withDone(current, tipId, done: true));
+    final wasDone = tip.done;
+    emit(_withDone(current, tipId, done: !wasDone));
     try {
-      await _repository.markTipDone(tipId);
+      if (wasDone) {
+        await _repository.unmarkTipDone(tipId);
+      } else {
+        await _repository.markTipDone(tipId);
+      }
     } on ApiException catch (e) {
-      _revert(tipId, e.message);
+      _revert(tipId, wasDone, e.message);
     } on NoConnectionException catch (e) {
-      _revert(tipId, e.message);
+      _revert(tipId, wasDone, e.message);
     }
   }
 
-  void _revert(String tipId, String message) {
+  void _revert(String tipId, bool done, String message) {
     final current = state;
     if (current is TipsLoaded) {
-      emit(_withDone(current, tipId, done: false, actionError: message));
+      emit(_withDone(current, tipId, done: done, actionError: message));
     }
   }
 

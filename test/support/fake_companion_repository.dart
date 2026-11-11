@@ -45,6 +45,9 @@ class FakeCompanionRepository implements CompanionRepository {
   List<DailyTip> cached = [];
   Object? error;
   Object? markDoneError;
+  Object? unmarkDoneError;
+  final markCalls = <String>[];
+  final unmarkCalls = <String>[];
 
   // El fake no usa la API ni sqflite.
   @override
@@ -70,9 +73,19 @@ class FakeCompanionRepository implements CompanionRepository {
 
   @override
   Future<void> markTipDone(String tipId) async {
+    markCalls.add(tipId);
     if (markDoneError != null) throw markDoneError!;
     tips = [
       for (final tip in tips) tip.id == tipId ? tip.copyWith(done: true) : tip,
+    ];
+  }
+
+  @override
+  Future<void> unmarkTipDone(String tipId) async {
+    unmarkCalls.add(tipId);
+    if (unmarkDoneError != null) throw unmarkDoneError!;
+    tips = [
+      for (final tip in tips) tip.id == tipId ? tip.copyWith(done: false) : tip,
     ];
   }
 }

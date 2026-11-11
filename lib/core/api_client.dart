@@ -51,6 +51,8 @@ class ApiClient {
   Future<dynamic> post(String path, {Object? body, bool auth = true}) =>
       _send('POST', path, body: body, auth: auth);
 
+  Future<dynamic> delete(String path) => _send('DELETE', path, auth: true);
+
   Future<dynamic> _send(
     String method,
     String path, {
@@ -79,13 +81,15 @@ class ApiClient {
 
     final http.Response response;
     try {
-      final request = method == 'GET'
-          ? _http.get(uri, headers: headers)
-          : _http.post(
-              uri,
-              headers: headers,
-              body: body == null ? null : jsonEncode(body),
-            );
+      final request = switch (method) {
+        'GET' => _http.get(uri, headers: headers),
+        'DELETE' => _http.delete(uri, headers: headers),
+        _ => _http.post(
+          uri,
+          headers: headers,
+          body: body == null ? null : jsonEncode(body),
+        ),
+      };
       response = await request.timeout(timeout);
     } on SocketException {
       throw const NoConnectionException();

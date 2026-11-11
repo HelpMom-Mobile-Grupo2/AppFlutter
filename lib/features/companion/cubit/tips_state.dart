@@ -23,7 +23,7 @@ final class TipsLoaded extends TipsState {
   /// true si los tips vienen de sqflite porque no hay internet.
   final bool isOffline;
 
-  /// Error al marcar "Hecho": se muestra una sola vez (SnackBar).
+  /// Error al marcar o desmarcar un tip: se muestra una sola vez (SnackBar).
   final String? actionError;
 
   @override

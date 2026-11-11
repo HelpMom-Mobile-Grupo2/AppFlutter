@@ -86,6 +86,21 @@ void main() {
     expect(result, isNull);
   });
 
+  test('delete usa el método DELETE con el token', () async {
+    late http.Request sent;
+    final client = buildClient((request) async {
+      sent = request;
+      return http.Response('', 204);
+    });
+
+    final result = await client.delete('/api/companion/tips/t1/done');
+
+    expect(sent.method, 'DELETE');
+    expect(sent.url.toString(), 'https://api.test/api/companion/tips/t1/done');
+    expect(sent.headers['Authorization'], 'Bearer abc123');
+    expect(result, isNull);
+  });
+
   test('sin auth no envía el token', () async {
     late http.Request sent;
     final client = buildClient((request) async {

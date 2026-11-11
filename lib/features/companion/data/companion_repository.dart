@@ -31,6 +31,11 @@ class CompanionRepository {
     await localDb.update(LocalDb.tipsTable, tipId, {'done': 1});
   }
 
+  Future<void> unmarkTipDone(String tipId) async {
+    await api.unmarkTipDone(tipId);
+    await localDb.update(LocalDb.tipsTable, tipId, {'done': 0});
+  }
+
   Map<String, Object?> _toRow(DailyTip tip, int position) => {
     'id': tip.id,
     'position': position,

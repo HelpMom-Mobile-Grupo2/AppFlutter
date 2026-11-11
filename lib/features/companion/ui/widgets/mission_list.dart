@@ -2,20 +2,20 @@ import 'package:flutter/material.dart';
 
 import '../../data/daily_tip.dart';
 
-/// Checklist de los tips del día. Un tip hecho ya no se puede desmarcar
-/// (el backend no tiene esa opción).
+/// Checklist de los tips del día. Tocar un tip hecho lo desmarca, por si
+/// se marcó por error.
 class MissionList extends StatelessWidget {
   const MissionList({
     super.key,
     required this.tips,
-    required this.onDone,
+    required this.onToggle,
     this.title = 'Misión de apoyo de hoy',
     this.showBody = false,
     this.isOffline = false,
   });
 
   final List<DailyTip> tips;
-  final ValueChanged<String> onDone;
+  final ValueChanged<String> onToggle;
   final String title;
 
   /// En Guía se muestra el texto completo de cada tip.
@@ -54,7 +54,7 @@ class MissionList extends StatelessWidget {
               for (final tip in tips)
                 CheckboxListTile(
                   value: tip.done,
-                  onChanged: tip.done ? null : (_) => onDone(tip.id),
+                  onChanged: (_) => onToggle(tip.id),
                   controlAffinity: ListTileControlAffinity.leading,
                   contentPadding: EdgeInsets.zero,
                   title: Text(

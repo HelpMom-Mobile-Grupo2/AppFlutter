@@ -204,7 +204,7 @@ class _MissionSection extends StatelessWidget {
           TipsLoaded(:final tips, :final isOffline) => MissionList(
             tips: tips,
             isOffline: isOffline,
-            onDone: cubit.markDone,
+            onToggle: cubit.toggle,
           ),
           TipsFailure(:final message, :final isOffline) => Card(
             child: isOffline

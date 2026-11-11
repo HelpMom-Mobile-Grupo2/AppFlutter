@@ -24,4 +24,9 @@ class CompanionApi {
   Future<void> markTipDone(String tipId) async {
     await _client.post('/api/companion/tips/$tipId/done');
   }
+
+  /// 204 sin cuerpo. Desmarca el tip de hoy (si se marcó por error).
+  Future<void> unmarkTipDone(String tipId) async {
+    await _client.delete('/api/companion/tips/$tipId/done');
+  }
 }
