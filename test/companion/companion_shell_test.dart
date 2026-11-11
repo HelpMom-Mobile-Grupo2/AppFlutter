@@ -13,6 +13,7 @@ import 'package:helpmom_companion/features/companion/data/companion_summary.dart
 import 'package:helpmom_companion/features/companion/ui/companion_shell.dart';
 import 'package:helpmom_companion/features/family/data/family_repository.dart';
 import 'package:helpmom_companion/features/profile/cubit/profile_cubit.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../support/fake_alerts_repository.dart';
@@ -24,6 +25,9 @@ void main() {
   late SessionStore session;
   late FakeAlertsRepository alertsRepository;
   late FakeCompanionRepository companionRepository;
+
+  // Las alertas de prueba tienen más de un día y se muestran con fecha.
+  setUpAll(() => initializeDateFormatting('es'));
 
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
