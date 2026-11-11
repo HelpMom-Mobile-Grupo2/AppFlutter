@@ -38,9 +38,9 @@ const _pages = [HomeScreen(), AlertsScreen(), GuideScreen(), ProfileScreen()];
 /// También avisa al AlertsBloc qué pestaña se ve, para que el polling corra
 /// solo con Inicio o Alertas en pantalla y la app en primer plano.
 ///
-/// Además, cada [refreshInterval] pide las alertas pendientes y el resumen
-/// (en cualquier pestaña) para que una SOS nueva abra su aviso sin tener que
-/// deslizar. Solo mientras la app está abierta: no hay servicios en segundo
+/// Además, cada [refreshInterval] pide el resumen y, en Guía o Perfil, las
+/// alertas pendientes, para que una SOS nueva abra su aviso sin tener que
+/// deslizar. En Inicio y Alertas las alertas ya las consulta el AlertsBloc. Solo mientras la app está abierta: no hay servicios en segundo
 /// plano.
 class CompanionShell extends StatefulWidget {
   const CompanionShell({
@@ -87,9 +87,13 @@ class _CompanionShellState extends State<CompanionShell> {
 
   void _refresh() {
     if (!_appVisible) return;
-    context.read<AlertsBloc>().add(
-      const AlertsRefreshRequested(AlertsView.home),
-    );
+    // Inicio (0) y Alertas (1) ya tienen el polling del AlertsBloc: así no
+    // se piden las alertas dos veces.
+    if (_index > 1) {
+      context.read<AlertsBloc>().add(
+        const AlertsRefreshRequested(AlertsView.home),
+      );
+    }
     context.read<SummaryCubit>().load();
   }
 

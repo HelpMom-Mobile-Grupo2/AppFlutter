@@ -293,7 +293,27 @@ void main() {
       expect(alertsRepository.respondCalls, [('sos1', AlertResponse.onMyWay)]);
     });
 
-    testWidgets('el timer trae la SOS sin deslizar, desde cualquier pestaña', (
+    testWidgets('en Inicio el timer no repite el pedido de alertas', (
+      tester,
+    ) async {
+      setScreenSize(tester, const Size(400, 900));
+      await tester.pumpWidget(
+        buildApp(refreshInterval: const Duration(seconds: 5)),
+      );
+      await tester.pumpAndSettle();
+      final alertCalls = alertsRepository.fetchPendingCalls;
+      final summaryCalls = companionRepository.summaryCalls;
+
+      // 5 s: corre el timer del contenedor, todavía no el polling del bloc
+      // (15 s).
+      await tester.pump(const Duration(seconds: 5));
+      await tester.pumpAndSettle();
+
+      expect(alertsRepository.fetchPendingCalls, alertCalls);
+      expect(companionRepository.summaryCalls, greaterThan(summaryCalls));
+    });
+
+    testWidgets('el timer trae la SOS sin deslizar, desde Perfil', (
       tester,
     ) async {
       setScreenSize(tester, const Size(400, 900));
